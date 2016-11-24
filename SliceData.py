@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import json
 import itertools
+from sklearn.preprocessing import StandardScaler
 import unicodedata
 
 
@@ -69,27 +70,41 @@ def filter(dataset, keep_cols = [], filter_on=[], conditions=[], path ='data'):
         df = eval('df[df.'+eval('%s[%d]' % (filter_on, i))+eval('%s[%d]' % (conditions, i))+']')
     return df
 
-def ctry_cmd_shares(dataset, yr = 2015, path = 'data'):
+def rca(dataset, yr = 2015, path ='data', matrix = False):
+    '''
+    returns dataframe with export shares and revealed comparative advantage for each ctry-cmd
+    '''
     df = filter(dataset, filter_on = ['yr'], conditions = ['==%d' % yr], path = path)
     cmds = set(df.cmdCode)
     ctries = set(df.fromCode)
     ctry_cmd_totals = df.groupby(['fromCode', 'cmdCode']).apply(lambda x: pd.Series(dict(
-            exportValue=x.tradeValue.sum()
+            ctry_cmd_total=x.tradeValue.sum()
     ))).reset_index()
-    ctry_totals = df.groupby(['fromCode']).apply(lambda x: pd.Series(dict(
-            exportTotal=x.tradeValue.sum()
+    ctry_totals = ctry_cmd_totals.groupby(['fromCode']).apply(lambda x: pd.Series(dict(
+            ctry_total=x.ctry_cmd_total.sum()
     ))).reset_index()
-    ctry_cmd_shares = ctry_cmd_totals.merge(ctry_totals, on = 'fromCode', right_index = True)
+    cmd_totals = df.groupby(['cmdCode']).apply(lambda x: pd.Series(dict(
+            cmd_total=x.tradeValue.sum()
+    ))).reset_index()
+    cmd_totals['globalShare'] = cmd_totals['cmd_total'] / cmd_totals.cmd_total.sum(axis=0)
+
+    ctry_cmd_shares = ctry_cmd_totals.merge(ctry_totals, on = 'fromCode')
+    ctry_cmd_shares = ctry_cmd_shares.merge(cmd_totals[['cmdCode','globalShare']], on = 'cmdCode')
     ctry_cmd_shares = ctry_cmd_shares.set_index(['fromCode', 'cmdCode'])
-    ctry_cmd_shares['exportShare'] = ctry_cmd_shares['exportValue'] / ctry_cmd_shares['exportTotal']
+    ctry_cmd_shares['exportShare'] = ctry_cmd_shares['ctry_cmd_total'] / ctry_cmd_shares['ctry_total']
+    ctry_cmd_shares['rca'] = ctry_cmd_shares['exportShare']/ctry_cmd_shares['globalShare']
     # fill in missing commodities
     complete_index = list(itertools.product(ctries, cmds))
     ctry_cmd_shares = ctry_cmd_shares.reindex(complete_index, fill_value=0)
     ctry_cmd_shares.reset_index(inplace=True)
-    ctry_cmd_shares['hasExport'] = (ctry_cmd_shares['exportShare'] > 0).values.astype(np.int)
-    return ctry_cmd_shares[['fromCode','cmdCode','exportShare', 'hasExport']]
+    ctry_cmd_shares['hasRCA'] = (ctry_cmd_shares['rca'] > 1).values.astype(np.int)
+    if matrix:
+        ctry_cmd_shares = ctry_cmd_shares.pivot(index='fromCode',columns='cmdCode',values='rca')
+    else:
+        ctry_cmd_shares = ctry_cmd_shares[['fromCode', 'cmdCode', 'exportShare', 'rca', 'hasRCA']]
+    return ctry_cmd_shares
 
-def ctry_matrix(dataset, yr=2015, cols = 'cmd', path = 'data', imports = False):
+def ctry_matrix(dataset, yr=2015, cols = 'cmd', path = 'data', imports = False, standardise = True):
     records = filter(dataset, keep_cols = ['fromCode', 'toCode', 'yr', 'tradeValue', 'cmdCode'],
                      filter_on=['yr'],
                      conditions=['==%d' % yr])
@@ -109,7 +124,8 @@ def ctry_matrix(dataset, yr=2015, cols = 'cmd', path = 'data', imports = False):
     records_totals = records.groupby(['rows', 'cols']).apply(lambda x: pd.Series(dict(
         tradeValue=x.tradeValue.sum()
     ))).reset_index()
-
+    if standardise:
+        records_totals.tradeValue = StandardScaler().fit_transform(records_totals.tradeValue)
     matrix = records_totals.pivot(index='rows', columns='cols', values='tradeValue')
     if cols == 'ctry':
         ctries_all = list(set(matrix.index.values) | set(matrix.columns.values))
@@ -133,10 +149,49 @@ def save(df, save_as, csv = False, path = 'data'):
 
 if __name__ == "__main__":
     # this won't be run when imported
-    print get_headings('comtrade_2dg.tsv')
+    #print get_headings('comtrade_2011_2015_2dg_0.tsv')
 
-    df = filter('comtrade_2dg.tsv', keep_cols = ['fromCode', 'toCode', 'yr', 'tradeValue', 'cmdCode'],
-                filter_on = ['yr'],
-                conditions = ['==2010'])
+    remove = [  # countries/territories that don't interest me
+        'AIA',  # Anguilla
+        'ANT',  # Antartica
+        'ATA',  # Antartica
+        'BVT',  # Bouvet Island
+        'IOT',  # British Indian Ociean Terr.
+        'CXR',  # Christmas island
+        'CCK',  # Cook islands
+        'COK',  # Cocos is
+        'FLK',  # Falklands
+        'ATF',  # South Antartic Terr
+        'HMD',  # Heard and McDonald Island
+        'VAT',  # Vatican
+        'MYT',  # Mayotte
+        'MSR',  # Montserrat
+        'NIU',  # Nieu
+        'NFK',  # Norfolk Islands
+        'PCN',  # Pitcairn
+        'SHN',  # Saint Helena
+        'SPM',  # Saint Pierre and Miguelon
+        'SGS',  # South Georgia and the South Sandwich Islands
+        'TKL',  # Tokelau
+        'UMI',  # US Minor Outlying Islands
+        'WLF',  # Walls and Futuna
+        'ESH'  # Western Sahara
+    ]
+    cmd_remove = [
 
-    save(df, 'comtrade_2010_2dg')
+    ]
+    dataset = 'comtrade_2015_4dg_0.tsv'
+    path = '/media/peter/HDD/UN COMTRADE'
+    keep_cols=['fromCode', 'fromISO', 'toCode', 'toISO', 'yr', 'tradeValue', 'cmdCode']
+
+
+    df = read_data(dataset, path = path)
+    if len(keep_cols) != 0:
+        df = df[keep_cols]
+    #for iso in remove:
+    #    df = df[df.fromISO != iso]
+    #    df = df[df.toISO != iso]
+    df['oil'] = df.cmdCode.apply(lambda x: str(x).zfill(4)[:2] == '27')
+    df = df[df.oil == False] # remove Mineral fuels, oils, distillation products, etc"
+    df = df.drop('oil',axis=1)
+    save(df, 'comtrade_2015_4dg',path=path)
