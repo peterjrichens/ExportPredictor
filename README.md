@@ -1,6 +1,4 @@
-#Read me
-
-**tradeExplorer**
+#TradeExplorer
 
 Author: _Peter Richens_
 

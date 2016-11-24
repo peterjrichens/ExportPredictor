@@ -5,9 +5,11 @@ import math
 import os
 import time
 import unicodedata
-
+from datetime import datetime, timedelta
 import pandas as pd
 import requests
+import certifi
+import urllib3
 
 
 def get_ctry_codes_df():
@@ -21,6 +23,7 @@ def get_ctry_codes_df():
     remove = [ # countries/territories that don't interest me
         'AIA', # Anguilla
         'ANT', # Antartica
+        'ATA', # Antartica
         'BVT', # Bouvet Island
         'IOT', # British Indian Ociean Terr.
         'CXR', # Christmas island
@@ -88,11 +91,15 @@ def get_ctry_index(name, ctry_list):
     print "could not find index for %s" % name
 
 
-def get_start_index(rg, hs_list, ctry_list, num_com):
+def get_start_index(rg, hs_list, ctry_list, years, num_com):
+    #return 0,0  # uncomment for emergency restart
     with open("api_calls.csv", mode='rU') as f:
         api_calls = pd.read_csv(f, sep=',', header=0)
     api_calls['rg'] = api_calls['api_string'].apply(lambda x: x[x.find('rg=') + 3:x.find('rg=') + 4])
     api_calls = api_calls[api_calls.rg == rg]
+    yr_string = "%2C".join([str(yr) for yr in years])
+    api_calls['current_yrs'] = api_calls['api_string'].apply(lambda x: yr_string in x)
+    api_calls = api_calls[api_calls.current_yrs]
     api_calls['hs_digits'] = api_calls['file_name'].apply(lambda x: x[-3:-2])
     api_calls = api_calls[api_calls.hs_digits == str(len(hs_list[0]))]
     api_calls = api_calls[api_calls.row_count != 0]  # remove failed api requests
@@ -104,11 +111,12 @@ def get_start_index(rg, hs_list, ctry_list, num_com):
         last_ctry = last_ref[ctry_start:ctry_end]
         last_calls = api_calls[api_calls.file_name == current_ref]
         cmd_start_index = (last_calls.shape[0])*num_com
-    except:
+    except IndexError:
+        cmd_start_index, ctry_start_index = 0,0
+        return ctry_start_index, cmd_start_index
+    except Exception:
         cmd_start_index, ctry_start_index = len(ctry_list),len(hs_list)
         return ctry_start_index, cmd_start_index
-    #print 'ceil(cmd_start_index/num_com): ',math.ceil(cmd_start_index/num_com)
-    #print 'ceil(len(hs_list)/num_com):(hs_list): ',math.ceil(len(hs_list)/num_com)
     if cmd_start_index >= len(hs_list):
         cmd_start_index = 0
         ctry_start_index = get_ctry_index(last_ctry, ctry_list) + 6
@@ -141,15 +149,28 @@ def apiCall(s):
     time_stamp = time.ctime()
     try:
         r = requests.get(r'%s' % (s))
-    except requests.exceptions.ConnectionError:
-        time.sleep(1)
-        print "Connection refused. Will try again later."
-        return [], time_stamp
+    except Exception:
+        try:
+            r = requests.get(r'%s' % (s), verify=False)
+        except requests.exceptions.ConnectionError:
+            print "Connection refused. Will try again later."
+            return [], time_stamp
     try:
         data = r.json()
         df = pd.DataFrame(data['dataset'])
         print "returned %r, length: %r" % (type(df), len(df))
-    except:
+        if len(df) == 0:
+            # wait 1 sec and try again. if that fails wait 1 hour.
+            time.sleep(1)
+            try:
+                r = requests.get(r'%s' % (s), verify=False)
+                data = r.json()
+                df = pd.DataFrame(data['dataset'])
+            except Exception:
+                one_hour_from_now = datetime.now() + timedelta(hours=1)
+                print "Reached hourly call limit. Sleeping until %s" % format(one_hour_from_now, '%H:%M:%S')
+                time.sleep(3600)
+    except Exception:
         print "No data to parse. Will try again later."
         df = []
     return df, time_stamp
@@ -180,7 +201,7 @@ def getComtrade(hs_list, ctry_list, rg, yrs, freq = 'A', path = 'data', num_com 
         return
     yr_ref = '_'.join([str(yrs[0]), str(yrs[-1])])
 
-    ctry_start_index = get_start_index(rg, hs_list, ctry_list, num_com)[0]
+    ctry_start_index = get_start_index(rg, hs_list, ctry_list, yrs, num_com)[0]
     ctry_sublist = ctry_list[ctry_start_index:]
     for c in range(0,len(ctry_sublist),5):
         ctry_start = c
@@ -200,7 +221,7 @@ def getComtrade(hs_list, ctry_list, rg, yrs, freq = 'A', path = 'data', num_com 
                 ref = 'annual_imports_%s_%s' % (yr_ref, ctry_ref)
             if freq == 'M':
                 ref = 'monthly_imports__%s_%s' % (yr_ref, ctry_ref)
-        cmd_start_index = get_start_index(rg, hs_list, ctry_list, num_com)[1]
+        cmd_start_index = get_start_index(rg, hs_list, ctry_list, yrs, num_com)[1]
         for i in range(cmd_start_index,len(hs_list),num_com):
             start = i
             if i + num_com < len(hs_list):
@@ -345,7 +366,7 @@ def data_checks(path):
     dont_check = []
     for file in downloaded:
         with open('%s/%s' % (path,file), mode='rU') as f:
-            aggregation_level = int(file[-7])
+            aggregation_level = file[file.index('dg.')-1:file.index('dg.')]
             df = pd.read_csv(f, sep='\t', header=0)
             try:
              # will fail for any files in path not generated by this script
@@ -401,7 +422,7 @@ def get_wb(indictor, start_year, end_year):
     df = get_ctry_data()[['iso', 'country']].merge(df,on='country') # necessary to have ISO codes in dataframe
     return df
 
-
-getComtradeAll(hs_list(4), 2011, 2015)
-getComtradeAll(hs_list(4), 2011, 2015, imports = False)
-data_checks('data')
+if __name__ == "__main__":
+    #getComtradeAll(hs_list(4), 2011, 2015)
+    getComtradeAll(hs_list(4), 2001, 2005, imports = False)
+    data_checks('data')

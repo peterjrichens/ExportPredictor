@@ -4,7 +4,7 @@ import sys
 
 
 def buildDataset(aggregation_level = '2dg', start_year = 2001, end_year = 2015,
-                 sample = False, max_rows = 20000000, data_path = 'data'):
+                 keep_yr = None, sample = False, max_rows = 50000000, data_path = 'data'):
     '''
     :param aggregation_level: HS product code aggregation ('2dg', '4dg' or '6dg')
     :param start_year: 1986 <= integer <= 2011 ending in 1 or 6
@@ -35,6 +35,12 @@ def buildDataset(aggregation_level = '2dg', start_year = 2001, end_year = 2015,
         if len(exports) > 10:
             exports = exports[:10]
 
+    headers = ['AltQuantity','CIFValue', 'FOBValue', 'GrossWeight', 'IsLeaf', 'NetWeight', 'TradeQuantity',
+               'TradeValue', 'aggrLevel', 'cmdCode', 'cmdDescE', 'cstCode', 'cstDesc', 'estCode', 'motCode',
+               'motDesc', 'period', 'periodDesc', 'pfCode', 'pt3ISO', 'pt3ISO2', 'ptCode', 'ptCode2',
+               'ptTitle', 'ptTitle2', 'qtAltCode', 'qtAltDesc', 'qtCode', 'qtDesc', 'rgCode', 'rgDesc',
+               'rt3ISO', 'rtCode', 'rtTitle', 'yr']
+
     keepColumns = ['rt3ISO','rtCode','rtTitle','pt3ISO','ptCode','ptTitle','aggrLevel',
                    'cmdCode','cmdDescE','yr','period','rgDesc','TradeValue']
 
@@ -42,27 +48,37 @@ def buildDataset(aggregation_level = '2dg', start_year = 2001, end_year = 2015,
     for i,file in enumerate(imports):
         with open('%s/%s' % (data_path, file), mode = 'rU') as f:
             print 'appending %d/%d: %s' % (i+1, len(imports), file)
-            df = pd.read_csv(f, sep = '\t', header = 0, usecols = keepColumns)
+            try:
+                df = pd.read_csv(f, sep = '\t', header=0, usecols=keepColumns)
+            except ValueError:
+                df = pd.read_csv(f, sep = '\t', header=None, names=headers, usecols=keepColumns)
             imports_df = imports_df.append(df)
 
+    imports_df = imports_df.dropna(axis=0, how='all')
     int_cols = ['rtCode','ptCode','aggrLevel','cmdCode','yr']
     imports_df[int_cols] = imports_df[int_cols].apply(lambda x: x.astype(int))
     imports_df.rename(columns={'rt3ISO': 'toISO', 'rtCode': 'toCode', 'rtTitle': 'toTitle',
                                    'pt3ISO': 'fromISO', 'ptCode': 'fromCode', 'ptTitle': 'fromTitle'}, inplace=True)
 
-    if len(exports) > 0:
-        exports_df = pd.DataFrame(columns = keepColumns)
-        for i,file in enumerate(exports):
-            with open('%s/%s' % (data_path, file), mode = 'rU') as f:
-                print 'appending %d/%d: %s' % (i+1, len(exports), file)
+    exports_df = pd.DataFrame(columns = keepColumns)
+    for i,file in enumerate(exports):
+        with open('%s/%s' % (data_path, file), mode = 'rU') as f:
+            print 'appending %d/%d: %s' % (i+1, len(exports), file)
+            try:
                 df = pd.read_csv(f, sep = '\t', header = 0, usecols = keepColumns)
-                exports_df = exports_df.append(df)
+            except ValueError:
+                df = pd.read_csv(f, sep='\t', header=None, names=headers, usecols=keepColumns)
+            exports_df = exports_df.append(df)
+    exports_df = exports_df.dropna(axis=0, how='any')
+    exports_df[int_cols] = exports_df[int_cols].apply(lambda x: x.astype(int))
+    exports_df.rename(columns={'rt3ISO': 'fromISO', 'rtCode': 'fromCode', 'rtTitle': 'fromTitle',
+                                   'pt3ISO': 'toISO', 'ptCode': 'toCode', 'ptTitle': 'toTitle'}, inplace=True)
 
-        exports_df[int_cols] = exports_df[int_cols].apply(lambda x: x.astype(int))
-        exports_df.rename(columns={'rt3ISO': 'fromISO', 'rtCode': 'fromCode', 'rtTitle': 'fromTitle',
-                                       'pt3ISO': 'toISO', 'ptCode': 'toCode', 'ptTitle': 'toTitle'}, inplace=True)
+    for yr in range(start_year,end_year):
+        imports_df = imports_df[imports_df.yr == yr]
+        exports_df = exports_df[exports_df.yr == yr]
 
-        print 'merging import and export datasets'
+        print 'merging import and export datasets for %d' % yr
         comtrade = imports_df.merge(exports_df,how = 'outer',
                     on = ['fromISO','fromCode','fromTitle',
                           'toISO','toCode','toTitle',
@@ -75,29 +91,58 @@ def buildDataset(aggregation_level = '2dg', start_year = 2001, end_year = 2015,
         comtrade['tradeValue'] = comtrade.reportedByImporter
         comtrade.ix[comtrade.source == 'Export', 'TradeValue'] = comtrade.reportedByExporter
         comtrade = comtrade.drop(['rgDesc_x','rgDesc_y'], axis = 1)
-    else: #no export data
-        comtrade.rename(columns={'TradeValue': 'tradeValue'}, inplace=True)
-        comtrade = imports_df
-        comtrade.rename(columns={'rgDesc': 'source'}, inplace=True)
 
-    if sample:
-        save_as = 'comtrade_%d_%d_%s_sample' % (start_year,end_year,aggregation_level)
-    else:
+        remove = [  # countries/territories that don't interest me
+            'AIA',  # Anguilla
+            'ANT',  # Antartica
+            'ATA',  # Antartica
+            'BVT',  # Bouvet Island
+            'IOT',  # British Indian Ociean Terr.
+            'CXR',  # Christmas island
+            'CCK',  # Cook islands
+            'COK',  # Cocos is
+            'FLK',  # Falklands
+            'ATF',  # South Antartic Terr
+            'HMD',  # Heard and McDonald Island
+            'VAT',  # Vatican
+            'MYT',  # Mayotte
+            'MSR',  # Montserrat
+            'NIU',  # Nieu
+            'NFK',  # Norfolk Islands
+            'PCN',  # Pitcairn
+            'SHN',  # Saint Helena
+            'SPM',  # Saint Pierre and Miguelon
+            'SGS',  # South Georgia and the South Sandwich Islands
+            'TKL',  # Tokelau
+            'UMI',  # US Minor Outlying Islands
+            'WLF',  # Walls and Futuna
+            'ESH'  # Western Sahara
+        ]
+        keep_cols = ['fromCode', 'fromISO', 'toCode', 'toISO', 'yr', 'tradeValue', 'cmdCode']
+
+        comtrade = comtrade[keep_cols]
+        for iso in remove:
+            comtrade = comtrade[comtrade.fromISO != iso]
+            comtrade = comtrade[comtrade.toISO != iso]
+
         save_as = 'comtrade_%d_%d_%s' % (start_year,end_year,aggregation_level)
+        if keep_yr!=None:
+            save_as = 'comtrade_%d_%s' % (keep_yr,aggregation_level)
+        if sample:
+            save_as = 'comtrade_%d_%d_%s_sample' % (start_year,end_year,aggregation_level)
+            if len(comtrade) <= max_rows:
+                return comtrade, save_as
+            return comtrade.sample(n=max_rows), save_as
 
-    if sample:
-        if len(comtrade) <= max_rows:
-            return comtrade, save_as
-        return comtrade.sample(n=max_rows), save_as
-
-    dataframes = []
-    for start_row in range(0,len(comtrade),max_rows):
-        end_row = start_row + max_rows
-        if end_row < len(comtrade):
-            dataframes.append(comtrade[start_row:end_row])
-        else:
-            dataframes.append(comtrade[start_row:])
-    return dataframes, save_as
+        dataframes = []
+        for start_row in range(0,len(comtrade),max_rows):
+            end_row = start_row + max_rows
+            if end_row < len(comtrade):
+                dataframes.append(comtrade[start_row:end_row])
+            else:
+                dataframes.append(comtrade[start_row:])
+        save_with_warning(comtrade, data_path, save_as)
+        print 'saved %s' % save_as
 
 
 def save(data, path, file_stub):
@@ -118,7 +163,4 @@ def save_with_warning(data, path, file_stub):
     save(data, path, file_stub)
 
 
-comtrade,save_as = buildDataset(aggregation_level = '4dg', start_year = 1996, end_year = 2005)
-
-save_with_warning(comtrade, 'data', save_as)
-
+buildDataset(aggregation_level = '4dg', start_year = 2011, end_year = 2015, data_path='/media/peter/HDD/UN COMTRADE')
