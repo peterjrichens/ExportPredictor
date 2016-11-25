@@ -64,7 +64,9 @@ body {
   left: 0;
   min-width: 100%;
   height: 500px;
+  opacity: 0.5;
 }
+
 
 
 /* MARKETING CONTENT
