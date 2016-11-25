@@ -1,5 +1,11 @@
 ^~
 
+data/
+api_calls.csv
+gephi/
+working.py
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
