@@ -4,6 +4,11 @@ data/
 api_calls.csv
 gephi/
 working.py
+.idea/
+literature/
+Clusters.py
+Recommender.py
+Visualisations.py
 
 
 # Byte-compiled / optimized / DLL files

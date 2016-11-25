@@ -6,7 +6,6 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import pdist, squareform
 from sklearn.preprocessing import MinMaxScaler
-from scipy.stats.mstats import zscore
 from sklearn.metrics.pairwise import cosine_similarity
 
 def get_ctry_codes_df():
@@ -82,35 +81,11 @@ class Country(object):
         self.name = get_ctries_dict()[code]['name']
         self.iso = get_ctries_dict()[code]['iso']
 
-def country_list(attribute):
-    assert attribute in ['code', 'name', 'iso']
-    if attribute == 'code':
-        return get_ctries_dict().keys()
-    if attribute == 'name':
-        return [Country(code).name for code in get_ctries_dict().keys()]
-    if attribute == 'iso':
-        return [Country(code).iso for code in get_ctries_dict().keys()]
-
-
-class Origin(Country):
-    def __init__(self, code):
-        super(Origin, self).__init__(code)
-
-
-class Destination(Country):
-    def __init__(self, code):
-        super(Destination, self).__init__(code)
-
 
 class Commodity(object):
     def __init__(self, code):
         self.code = code
         self.name = get_cmds(len(code))[code]
-
-def commodity_list(aggregation_level, name=False):
-    if name:
-        return [Commodity(code).name for code in get_cmds(aggregation_level).keys()]
-    return get_cmds(aggregation_level).keys()
 
 
 def get_data(fname, path='data'):
@@ -387,10 +362,6 @@ class CountrySpace(object):
         nx.draw(graph, pos, labels=self.labels, with_labels=True)
         plt.show()
 
-#print CountrySpace(2011, 'comtrade_2011_4dg.tsv', feature='rca').similarity_rank() # looks ok
-#print CountrySpace(2011, 'comtrade_2011_4dg.tsv', feature='export_destination').similarity_rank() # driven by large countries eg. US
-#print CountrySpace(2011, 'comtrade_2011_4dg.tsv', feature='rca').get_closest(702)
-
 class CmdCtryMatrix(object):
 
     def __init__(self, yr, fname, path='data'):
@@ -424,10 +395,6 @@ class CmdCtryMatrix(object):
         if rows == 'countries':
             market_share = market_share.transpose()
         return market_share
-
-
-#print CountrySpace(2011, 'comtrade_2011_4dg.tsv', feature='intensity').feature_matrix.describe() # need to scale?
-#print CmdCtryMatrix(2011, 'comtrade_2011_4dg.tsv').RCA.describe() # normalise?
 
 class SingleYearDataset(object):
 
@@ -506,13 +473,11 @@ class SingleYearDataset(object):
         df.to_csv('%s/%s' % (save_path,fname), sep=',')
 
 
-#print SingleYearDataset(2011, 'comtrade_2011_2dg.tsv').join_features()
-
 class FinalDataset(object):
 
     def __init__(self, yr, base_yr, path='data'):
         '''
-        :param yr: year to train PredictiveModels. TODO: extend to multiple years
+        :param yr: year to train PredictiveModels. # TODO: extend to multiple years
         :param base_yr: filters dataset  - only commodities that are not exported in base_yr are kept
         :param path: location of data files
         '''
@@ -546,6 +511,5 @@ def save_final_dataset(yr, base_yr):
     FinalDataset(yr,base_yr).save('mldataset_4dg')
 
 if __name__ == "__main__":
-    #pass
     save_final_dataset(2015,2011)
 
