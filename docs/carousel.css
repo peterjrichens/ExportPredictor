@@ -33,6 +33,12 @@ body {
   width: auto;
 }
 
+.navbar-search {
+    float: right;
+    width: 200px;
+    padding: 10px;
+}
+
 
 /* CUSTOMIZE THE CAROUSEL
 -------------------------------------------------- */
