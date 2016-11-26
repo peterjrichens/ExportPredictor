@@ -504,6 +504,10 @@ class FinalDataset(object):
         df = self.build()
         print 'saving %s, rows: %d' % (save_as,len(df))
         df.to_csv('%s/%s.csv' % (self.path,save_as), sep=',')
+        sample = df.sample(frac=0.05, random_state=1)
+        print 'saving %s, rows: %d' % ('sample_'+save_as,len(sample))
+        sample.to_csv('%s.csv' % ('sample_'+save_as), sep=',')
+
 
 def save_final_dataset(yr, base_yr):
     SingleYearDataset(base_yr, 'comtrade_%d_4dg.tsv' % base_yr).save('mldataset_%d_4dg.csv' % base_yr)

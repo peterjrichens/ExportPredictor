@@ -8,14 +8,14 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
 from sklearn.model_selection import GridSearchCV
 import xgboost
 
 
-def load_data(fname, path='data'):
-    with open('%s/%s' % (path, fname), mode='rU') as f:
+def load_data(fname, path='data/'):
+    with open('%s%s' % (path, fname), mode='rU') as f:
         iter_csv = pd.read_csv(f, sep=',', header=0, iterator=True, chunksize=50000)
         df = pd.concat(iter_csv, ignore_index=True)
     df.index = [df.cmd,df.origin]
@@ -134,7 +134,11 @@ def predict(clf, X_train, X_test, y_train, y_test, threshold = 0.5):
 
 if __name__ == "__main__":
 
-    df = load_data('mldataset_4dg.csv')
+    try:
+        df = load_data('mldataset_4dg.csv')
+    except IOError:
+        df = load_data('sample_mldataset_4dg.csv', path='')
+
     X, y = preprocess(df,'has_export', ctry_dummies=False, cmd_dummies=False, pca=False)
 
 
@@ -144,7 +148,6 @@ if __name__ == "__main__":
         LogisticRegression(penalty='l1')  # (with dummies) accuracy = 0.838 auc =  0.69
     ]
 
-
     error_at_ctry_level(classifiers, X, y, df.cmd, df.origin)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=88)
@@ -152,19 +155,11 @@ if __name__ == "__main__":
     for clf in classifiers:
         print_scores(X_train, X_test, y_train, y_test, clf)
         cv(clf, X, y, 'accuracy')
-        cv(clf, X, y, 'roc_auc_score')
+        cv(clf, X, y, 'roc_auc')
 
     param_grid = {
-        'max_depth': range(25, 35, 2),
-        'max_features': range(10, 20, 2)
+        'max_features': range(25, 35, 2),
+        'max_depth': range(10, 20, 2)
     }
 
-    grid_search(param_grid, classifiers[1], 'roc_auc_score', X_train, X_test, y_train, y_test)
-
-
-
-
-
-
-
-
+    grid_search(param_grid, classifiers[1], 'roc_auc', X_train, X_test, y_train, y_test)
