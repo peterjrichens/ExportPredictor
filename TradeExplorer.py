@@ -328,6 +328,16 @@ class CountrySpace(object):
         check_missing(similarity)
         return similarity
 
+    def neighbours(self, k):
+        if self.feature == 'intensity':
+            similarity = self.feature_matrix.as_matrix()
+        else:
+            similarity = self.similarity().as_matrix()
+        neighbours = {}
+        for country, sim_array in zip(self.countries,similarity):
+            neighbours[country] = [self.countries[np.argsort(-sim_array)[:k]]]
+        return neighbours
+
     def get_distance(self,country_1,country_2,metric='euclidean'):
         return self.distance(metric).loc[country_1,country_2]
 
@@ -361,6 +371,7 @@ class CountrySpace(object):
         plt.title('Country space in %d based on %s' % (self.yr, self.feature))
         nx.draw(graph, pos, labels=self.labels, with_labels=True)
         plt.show()
+
 
 class CmdCtryMatrix(object):
 
@@ -464,11 +475,6 @@ class SingleYearDataset(object):
 
     def save(self,fname,save_path='data'):
         df = self.join_features()
-        #if isfile('%s/%s' % (save_path,fname)):
-        #    print 'appending %d, rows: %d' % (self.yr,len(df))
-        #    with open('%s/%s' % (save_path, fname), 'a') as f:
-        #        df.to_csv(f, header=False)
-        #else:
         print 'saving %s, rows: %d' % (fname,len(df))
         df.to_csv('%s/%s' % (save_path,fname), sep=',')
 
