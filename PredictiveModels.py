@@ -230,7 +230,7 @@ def ensemble_score(ensemble, y, metric):
     return score
 
 def resample_tuner(X, y, k_range, m_range, metric='accuracy'):
-    # only one of k_range, m_range and step_range should have length > 1
+    # only one of k_range, m_range should have length > 1
     scores = []
     for k in k_range:
         for m in m_range:
@@ -271,7 +271,7 @@ if __name__ == "__main__":
         LogisticRegression()                 # cv accuracy = 0.839(0.792) cv auc = 0.850(0.877)   unbalanced(resampled)
         #Ensemble (XGBClassifier)            # cv accuracy = 0.838(0.856) cv auc = 0.849(0.928)   unbalanced(resampled)
     ]
-    '''
+
     print_cv_score(classifiers, X, y)
 
     X_resampled, y_resampled = resample(X, y, k=14, m=12)
@@ -287,7 +287,7 @@ if __name__ == "__main__":
     print ensemble_score(ensemble, y, 'roc_auc')
     print ensemble_score(ensemble_resampled, y_resampled, 'accuracy')
     print ensemble_score(ensemble_resampled, y_resampled, 'roc_auc')
-    '''
+
     pred_proba = pred_proba(X, y, classifiers)
     pred_proba['pred_prob'].hist(by=pred_proba['has_export'])
     plt.show()
