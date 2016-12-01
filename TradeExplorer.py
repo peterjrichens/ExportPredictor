@@ -6,6 +6,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import pdist, squareform
 from sklearn.preprocessing import MinMaxScaler
+from scipy.stats import rankdata
 from sklearn.metrics.pairwise import cosine_similarity
 
 def get_ctry_codes_df():
@@ -230,7 +231,6 @@ class ProductSpace(object):
         self.labels = {i: get_cmds(self.aggregation_level)[code] for i, code in enumerate(codes)}
         self.rca_correlation_matrix = np.corrcoef(self.matrix, rowvar=0)
 
-
     def show_graph(self, country=None, cut_off=0.2):
         rows, cols = np.where(self.rca_correlation_matrix > cut_off)
         edges = zip(rows.tolist(), cols.tolist())
@@ -329,6 +329,7 @@ class CountrySpace(object):
         return similarity
 
     def neighbours(self, k):
+        # returns {country:[k nearest neighbours]}
         if self.feature == 'intensity':
             similarity = self.feature_matrix.as_matrix()
         else:
@@ -336,6 +337,32 @@ class CountrySpace(object):
         neighbours = {}
         for country, sim_array in zip(self.countries,similarity):
             neighbours[country] = [self.countries[np.argsort(-sim_array)[:k]]]
+        return neighbours
+
+    def rca_neighbours(self, k):
+        # returns the rca rank across commodities of k nearest neighbours for each country
+        # index = ['origin', 'cmd']. columns = rca_neighbour_1 to rca_neighbour_k
+        neighbours = pd.DataFrame.from_dict(self.neighbours(k), orient='index')
+        neighbours.columns = ['neighbours']
+        rca = ProductSpace(self.yr, self.fname, self.path).matrix
+        cmds = rca.columns
+        ctries = rca.index
+        for ctry in ctries:
+            rca.loc[ctry] = rankdata(rca.loc[ctry])
+        rca = pd.DataFrame(MinMaxScaler().fit_transform(rca.T).T, index=ctries,columns=cmds)
+        for i in range(k):
+            rca.columns = cmds
+            tups = zip(*[['%s_neighbour_%d' % (self.feature, i+1)] * rca.shape[1], rca.columns])
+            rca.columns = pd.MultiIndex.from_tuples(tups, names=['neighbour', 'cmd'])
+            neighbours['neighbour'] = neighbours.neighbours.apply(lambda x: x[i])
+            neighbours = neighbours.merge(rca, left_on='neighbour', right_index=True)
+            neighbours = neighbours.drop('neighbour', axis=1)
+        neighbours = neighbours.drop('neighbours', axis=1)
+        neighbours.columns = pd.MultiIndex.from_tuples(neighbours.columns, names=['', 'cmd'])
+        neighbours = neighbours.stack()
+        neighbours.index.rename(names=['origin', 'cmd'], inplace=True)
+        neighbours.sortlevel(level=0, axis=0, inplace=True)
+        neighbours = neighbours.reindex(index=neighbours.index, method='ffill')
         return neighbours
 
     def get_distance(self,country_1,country_2,metric='euclidean'):
@@ -371,7 +398,6 @@ class CountrySpace(object):
         plt.title('Country space in %d based on %s' % (self.yr, self.feature))
         nx.draw(graph, pos, labels=self.labels, with_labels=True)
         plt.show()
-
 
 class CmdCtryMatrix(object):
 
@@ -409,7 +435,7 @@ class CmdCtryMatrix(object):
 
 class SingleYearDataset(object):
 
-    def __init__(self, yr, fname, path='data'):
+    def __init__(self, yr, fname, path='data', k=5):
         '''
         :param yr: year as integer
         :param fname: dataset filename including extension
@@ -421,6 +447,7 @@ class SingleYearDataset(object):
         self.yr = yr
         self.fname = fname
         self.path = path
+        self.k = k
         self.matrices = CmdCtryMatrix(self.yr, self.fname, self.path)
         self.has_export = self.matrices.has_export.stack().sort_index(level=['origin','cmd'])
         self.index = self.has_export.index
@@ -431,46 +458,21 @@ class SingleYearDataset(object):
         assert self.has_export.shape[0] == self.observations
 
 
-    def repeat_rca_matrix(self):
-        '''
-        scales and repeats m x n rca dataframe n times. returns mn x n repeated scaled dataframe
-        '''
-        rca = self.matrices.RCA
-        index = rca.index
-        cols = rca.columns
-        rca = pd.DataFrame(MinMaxScaler().fit_transform(rca), columns=cols, index=index)  # doesn't destroy sparsity
-        rca = pd.concat([rca] * self.n)
-        rca.index = self.index
-        assert rca.shape[0] == self.observations
-        return rca
-
-    def expand_similarity(self, similarity_measure):
-        '''
-        scales and repeats each row of n x n square similarity matrix m times. returns mn x n expanded scaled dataframe
-        '''
-        assert similarity_measure in self.similarity_features
-        if similarity_measure == 'intensity':
-            similarity = CountrySpace(yr=self.yr, fname=self.fname, path=self.path, feature=similarity_measure).feature_matrix
-            check_missing(similarity)
-        else:
-            similarity = CountrySpace(yr=self.yr, fname=self.fname, path=self.path, feature=similarity_measure).similarity()
-        assert similarity.shape[0] == similarity.shape[1] == self.n
-        countries = similarity.columns
-        similarity = MinMaxScaler().fit_transform(similarity) # scale without losing sparsity
-        similarity = np.repeat(similarity,[self.m]*self.n, axis=0)
-        similarity = pd.DataFrame(data=similarity, index=self.index, columns=countries)
-        assert similarity.shape[0] == self.observations
-        return similarity
-
     def join_features(self):
         df = self.has_export
+        df = df.reorder_levels(['origin', 'cmd'])
         for similarity_feature in self.similarity_features:
-            element_wise_product = self.repeat_rca_matrix().multiply(self.expand_similarity(similarity_feature))
-            element_wise_product.columns = ['%s_similarity_'% similarity_feature + str(col) for col in element_wise_product.columns]
-            df = pd.concat([df,element_wise_product], axis=1)
+            neighbours = CountrySpace(yr=self.yr, fname=self.fname, path=self.path, feature=similarity_feature).rca_neighbours(self.k)
+            assert neighbours.shape[0] == self.observations
+            df = pd.concat([df,neighbours], axis=1, join_axes=[df.index])
         df = df.rename(columns={0:'has_export'})
         df['yr'] = self.yr
-        assert df.shape[0] == self.observations
+        try:
+            assert df.shape[0] == self.observations
+        except AssertionError:
+            print 'dataframe has %d rows, expected %d' % (df.shape[0], self.observations)
+            raise
+        check_missing(df)
         return df
 
     def save(self,fname,save_path='data'):
@@ -515,11 +517,11 @@ class FinalDataset(object):
         sample.to_csv('%s.csv' % ('sample_'+save_as), sep=',')
 
 
-def save_final_dataset(yr, base_yr):
-    SingleYearDataset(base_yr, 'comtrade_%d_4dg.tsv' % base_yr).save('mldataset_%d_4dg.csv' % base_yr)
-    SingleYearDataset(yr, 'comtrade_%d_4dg.tsv' % yr).save('mldataset_%d_4dg.csv' % yr)
+def save_final_dataset(yr, base_yr, k):
+    SingleYearDataset(base_yr, 'comtrade_%d_4dg.tsv' % base_yr, k=k).save('mldataset_%d_4dg.csv' % base_yr)
+    SingleYearDataset(yr, 'comtrade_%d_4dg.tsv' % yr, k=k).save('mldataset_%d_4dg.csv' % yr)
     FinalDataset(yr,base_yr).save('mldataset_4dg')
 
 if __name__ == "__main__":
-    save_final_dataset(2015,2011)
+    save_final_dataset(2015, 2011, 200)
 
