@@ -15,8 +15,8 @@ function change_source() {
     var menu_value = menu.node().options[menu.node().selectedIndex].value;
     var source = path_hash[menu_value];
 
-    var w = 1000,
-    h = 650,
+    var w = 1080,
+    h = 620,
     cr = 5, // circle radius
     fill = d3.scale.category20();
 
