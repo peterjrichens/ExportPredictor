@@ -9,7 +9,7 @@
     <meta name="author" content="">
     <link rel="icon" type="image/vnd.microsoft.icon" href="images/Gakuseisean-Ivista-2-Network-Globe-Connected.ico">
 
-    <title>TradeExplorer</title>
+    <title>Trade Explorer</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -40,33 +40,14 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="#">TradeExplorer</a>
+              <a class="navbar-brand" href="#">Trade Explorer</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
               <ul class="nav navbar-nav">
                 <li><a href="#about">About</a></li>
-                <li><a href="https://github.com/peterjrichens/TradeExplorer">GitHub</a></li>
-                <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">More <span class="caret"></span></a>
-                  <ul class="dropdown-menu">
-                    <li><a href="#">Action</a></li>
-                    <li><a href="#">Another action</a></li>
-                    <li><a href="#">Something else here</a></li>
-                    <li role="separator" class="divider"></li>
-                    <li class="dropdown-header">Nav header</li>
-                    <li><a href="#">Separated link</a></li>
-                    <li><a href="#">One more separated link</a></li>
-                  </ul>
-                </li>
-                <li>
-                  <form class="navbar-search" action='' id='ctrySearch' method='get' onKeyPress="return checkSubmit(event)">
-                            <input id = 'searchInput' list="countries" type="text" class="form-control" placeholder="Search countries...">
-                            <datalist id="countries">
-                              <option value="Afganistan">
-                              <option value="Andorra">
-                            </datalist>
-                  </form>
-                </li>
+                <li><a href="networks.html">Country Proximity</a></li>
+                <li><a href="dashboard.html">Export Predictions</a></li>
+                <li><a href="https://github.com/peterjrichens/TradeExplorer">Source Code</a></li>
               </ul>
             </div>
           </div>
@@ -91,7 +72,6 @@
           <div class="container">
             <div class="carousel-caption">
               <h1>Welcome to the Trade Explorer</h1>
-              <p>A machine learning project using the UN Comtrade Database.</p>
               <p><a class="btn btn-lg btn-primary" href="#" role="button">About</a></p>
             </div>
           </div>
@@ -102,7 +82,7 @@
             <div class="carousel-caption">
               <h1>Find patterns in global trade</h1>
               <p>How are countries connected through the goods they exchange?</p>
-              <p><a class="btn btn-lg btn-primary" href="#" role="button">Browse</a></p>
+              <p><a class="btn btn-lg btn-primary" href="networks.html" role="button">Explore</a></p>
             </div>
           </div>
         </div>
@@ -111,8 +91,8 @@
           <div class="container">
             <div class="carousel-caption">
               <h1>What will countries export next?</h1>
-              <p>Find predictions based on trade relationships, market access and underlying productive capabilities.</p>
-              <p><a class="btn btn-lg btn-primary" href="#" role="button">Learn more</a></p>
+              <p>Explore predictions based on trade relationships, global supply chains and underlying productive capabilities.</p>
+              <p><a class="btn btn-lg btn-primary" href="dashboard.html" role="button">Find out</a></p>
             </div>
           </div>
         </div>
@@ -137,73 +117,29 @@
       <!-- Three columns of text below the carousel -->
       <div class="row">
         <div class="col-lg-4">
-          <img class="img-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Generic placeholder image" width="140" height="140">
-          <h2>Heading</h2>
+          <img class="img-circle" src="images/math-1547018_1280.jpg" alt="Generic placeholder image" width="140" height="140">
+          <h2>About the Model</h2>
           <p>Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo cursus magna.</p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+          <p><a class="btn btn-default" href="#" role="button">Read more &raquo;</a></p>
         </div><!-- /.col-lg-4 -->
         <div class="col-lg-4">
-          <img class="img-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Generic placeholder image" width="140" height="140">
-          <h2>Heading</h2>
+          <img class="img-circle" src="images/world-1264062_1280.jpg" alt="Generic placeholder image" width="140" height="140">
+          <h2>Country Proximity</h2>
           <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+          <p><a class="btn btn-default" href="networks.html" role="button">View &raquo;</a></p>
         </div><!-- /.col-lg-4 -->
         <div class="col-lg-4">
-          <img class="img-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Generic placeholder image" width="140" height="140">
-          <h2>Heading</h2>
+          <img class="img-circle" src="images/map-428639_1280.jpg" alt="Generic placeholder image" width="140" height="140">
+          <h2>Predictions</h2>
           <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+          <p><a class="btn btn-default" href="#" role="button">View &raquo;</a></p>
         </div><!-- /.col-lg-4 -->
       </div><!-- /.row -->
 
 
-      <!-- START THE FEATURETTES -->
-
-      <hr class="featurette-divider">
-
-      <div class="row featurette">
-        <div class="col-md-7">
-          <h2 class="featurette-heading">First featurette heading. <span class="text-muted">It'll blow your mind.</span></h2>
-          <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
-        </div>
-        <div class="col-md-5">
-          <img class="featurette-image img-responsive center-block" data-src="holder.js/500x500/auto" alt="Generic placeholder image">
-        </div>
-      </div>
-
-      <hr class="featurette-divider">
-
-      <div class="row featurette">
-        <div class="col-md-7 col-md-push-5">
-          <h2 class="featurette-heading">Oh yeah, it's that good. <span class="text-muted">See for yourself.</span></h2>
-          <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
-        </div>
-        <div class="col-md-5 col-md-pull-7">
-          <img class="featurette-image img-responsive center-block" data-src="holder.js/500x500/auto" alt="Generic placeholder image">
-        </div>
-      </div>
-
-      <hr class="featurette-divider">
-
-      <div class="row featurette">
-        <div class="col-md-7">
-          <h2 class="featurette-heading">And lastly, this one. <span class="text-muted">Checkmate.</span></h2>
-          <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
-        </div>
-        <div class="col-md-5">
-          <img class="featurette-image img-responsive center-block" data-src="holder.js/500x500/auto" alt="Generic placeholder image">
-        </div>
-      </div>
-
-      <hr class="featurette-divider">
-
-      <!-- /END THE FEATURETTES -->
-
-
       <!-- FOOTER -->
       <footer>
-        <p class="pull-right"><a href="#">Back to top</a></p>
-        <p>TradeExplore was created by Peter Richens
+        <p>TradeExplorer was created by Peter Richens
           <a href="https://sg.linkedin.com/pub/peter-richens/31/bb0/b9a">
           <img src="https://static.licdn.com/scds/common/u/img/webpromo/btn_liprofile_blue_80x15.png" width="80" height="15" border="0" alt="View Peter Richens's profile on LinkedIn">
           </a>
