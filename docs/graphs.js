@@ -1,5 +1,5 @@
 queue()
-    .defer(d3.tsv, "/data")
+    .defer(d3.tsv, "predictions.csv")
     .await(showPredictions);
 
 
