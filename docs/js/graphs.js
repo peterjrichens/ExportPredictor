@@ -14,7 +14,6 @@ function showPredictions(error, data) {
         d.Country = d.ctry_name;
         });
 
-
   var ctries = d3.nest()
   .key(function(d) { return d.Country; })
   .entries(data);
@@ -69,12 +68,14 @@ function showPredictions(error, data) {
 
   function treeNote (mode, selection){
       if (mode == 'select country'){
-        var count = (1229 - countryData(selection).length).toString()
-        var string = selection.concat(" has already exported ").concat(count).concat(" out of 1229 products.");
+        var count = countryData(selection).length.toString()
+        if (count == 1) {var string = "There is only 1 product ").concat(selection).concat(" has not exported.");};
+        else {var string = "There are ".concat(count).concat(" products ").concat(selection).concat(" has not exported.");};
       }
       if (mode == 'select product'){
-        var count = (205 - cmdData(selection).length).toString()
-        var string = count.concat(" countries have already exported ").concat(selection).concat('.');
+        var count = cmdData(selection).length.toString()
+        if (count == 1) {var string = "Only 1 country has not exported ").concat(selection).concat('.');};
+        else {var string = count.concat(" countries have not exported ").concat(selection).concat('.');};
       }
       document.getElementById('tree-notes').innerHTML = string;
     };
