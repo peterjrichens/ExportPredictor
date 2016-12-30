@@ -1,23 +1,21 @@
 # -*- coding: utf-8 -*-
 import collections
 import csv
-import math
 import os
 import time
 import unicodedata
 from datetime import datetime, timedelta
 import pandas as pd
 import requests
-import certifi
-import urllib3
+
 
 
 def get_ctry_codes_df():
     with open('UN Comtrade Country List.csv', mode='rU') as f:
         ctry_codes = pd.read_csv(f, sep=',', header=0)
-    ctry_codes = ctry_codes[['Country Code', 'Country Name English', 'ISO3-digit Alpha',
+    ctry_codes = ctry_codes[['Country Code', 'Country Name English','ISO2-digit Alpha', 'ISO3-digit Alpha',
                                    'Start Valid Year', 'End Valid Year']]
-    ctry_codes.columns = ['code', 'name', 'iso', 'start', 'end']
+    ctry_codes.columns = ['code', 'name', 'iso2', 'iso', 'start', 'end']
     ctry_codes['code'] = ctry_codes['code'].apply(str)
     ctry_codes = ctry_codes[ctry_codes.code != '0'] #remove 'world'
     remove = [ # countries/territories that don't interest me
@@ -170,19 +168,23 @@ def apiCall(s):
                 one_hour_from_now = datetime.now() + timedelta(hours=1)
                 print "Reached hourly call limit. Sleeping until %s" % format(one_hour_from_now, '%H:%M:%S')
                 time.sleep(3600)
+    except ValueError:
+        one_hour_from_now = datetime.now() + timedelta(hours=1)
+        print "Reached hourly call limit. Sleeping until %s" % format(one_hour_from_now, '%H:%M:%S')
+        time.sleep(3600)
+        df = []
     except Exception:
         print "No data to parse. Will try again later."
         df = []
     return df, time_stamp
 
-def getComtrade(hs_list, ctry_list, rg, yrs, freq = 'A', path = 'data', num_com = 20):
+def getComtrade(hs_list, ctry_list, rg, yrs, freq = 'A', num_com = 20):
     '''
     :param hs_list: array/list of HS country codes as strings
     :param ctry_list: list of country codes as strings
     :param rg: rg='1' for imports and '2' for exports - only tested for imports
     :param yrs: array of years as integers
     :param freq: 'A' or 'M' for year or monthly data respectively
-    :param path: directory to save data
     :param num_com: Number of commodities for each api call. No reason to change this. This is the max value.
     :return:
     '''
@@ -423,6 +425,7 @@ def get_wb(indictor, start_year, end_year):
     return df
 
 if __name__ == "__main__":
-    #getComtradeAll(hs_list(4), 2011, 2015)
-    getComtradeAll(hs_list(4), 2001, 2005, imports = False)
-    data_checks('data')
+    getComtradeAll(hs_list(4), 1996, 2015)
+    getComtradeAll(hs_list(4), 1996, 2015, imports = False)
+    data_checks(path='data')
+

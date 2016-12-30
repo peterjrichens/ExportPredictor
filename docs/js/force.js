@@ -2,12 +2,12 @@
 var menu = d3.select("#menu1");
 
 var path_hash = {
-        '1': "rca.json",
-        '2': "imports.json",
-        '3': "export_destination.json",
-        '4': "import_origin.json",
-        '5': "intensity.json",
-        '6': "distance.json"
+        '1': "json/rca.json",
+        '2': "json/imports.json",
+        '3': "json/export_destination.json",
+        '4': "json/import_origin.json",
+        '5': "json/intensity.json",
+        '6': "json/distance.json"
 };
 
 function change_source() {
@@ -15,7 +15,7 @@ function change_source() {
     var menu_value = menu.node().options[menu.node().selectedIndex].value;
     var source = path_hash[menu_value];
 
-    var w = 1080,
+    var w = 1100,
     h = 620,
     cr = 5, // circle radius
     fill = d3.scale.category20();
