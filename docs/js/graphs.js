@@ -69,12 +69,12 @@ function showPredictions(error, data) {
   function treeNote (mode, selection){
       if (mode == 'select country'){
         var count = countryData(selection).length.toString()
-        if (count == 1) {var string = "There is only 1 product ").concat(selection).concat(" has not exported.");};
+        if (count == 1) {var string = "There is only 1 product ".concat(selection).concat(" has not exported.");};
         else {var string = "There are ".concat(count).concat(" products ").concat(selection).concat(" has not exported.");};
       }
       if (mode == 'select product'){
         var count = cmdData(selection).length.toString()
-        if (count == 1) {var string = "Only 1 country has not exported ").concat(selection).concat('.');};
+        if (count == 1) {var string = "Only 1 country has not exported ".concat(selection).concat('.');};
         else {var string = count.concat(" countries have not exported ").concat(selection).concat('.');};
       }
       document.getElementById('tree-notes').innerHTML = string;
