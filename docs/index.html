@@ -9,10 +9,11 @@
     <meta name="author" content="">
     <link rel="icon" type="image/vnd.microsoft.icon" href="images/Gakuseisean-Ivista-2-Network-Globe-Connected.ico">
 
-    <title>Trade Explorer</title>
+    <title>Export Predictor</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="lib/css/keen-dashboards.css" />
 
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -27,30 +28,25 @@
 <!-- NAVBAR
 ================================================== -->
   <body>
-    <div class="navbar-wrapper">
-      <div class="container">
-        <nav class="navbar navbar-inverse navbar-static-top">
-          <div class="container">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              <a class="navbar-brand" href="#">Trade Explorer</a>
-            </div>
-            <div id="navbar" class="navbar-collapse collapse">
-              <ul class="nav navbar-nav">
-                <li><a href="#about">About</a></li>
-                <li><a href="networks.html">Country Proximity</a></li>
-                <li><a href="dashboard.html">Export Predictions</a></li>
-                <li><a href="https://github.com/peterjrichens/TradeExplorer">Source Code</a></li>
-              </ul>
-            </div>
-          </div>
-        </nav>
-
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="">The Export Predictor</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-left">
+            <li><a href="about.html">About</a></li>
+            <li><a href="networks.html">Country Proximity</a></li>
+            <li><a href="dashboard.html">Export Predictions</a></li>
+            <li><a href="https://github.com/peterjrichens/TradeExplorer">Source Code</a></li>
+          </ul>
+        </div>
       </div>
     </div>
 
@@ -69,8 +65,9 @@
           <img class="first-slide" src="https://static.pexels.com/photos/5439/earth-space.jpg" alt="First slide">
           <div class="container">
             <div class="carousel-caption">
-              <h1>Welcome to the Trade Explorer</h1>
-              <p><a class="btn btn-lg btn-primary" href="#" role="button">About</a></p>
+              <h1>Welcome to the Export Predictor</h1>
+              <p>Using machine learning to identify latent comparative advantage.</p>
+              <p><a class="btn btn-lg btn-primary" href="about.html" role="button">About</a></p>
             </div>
           </div>
         </div>
@@ -89,7 +86,7 @@
           <div class="container">
             <div class="carousel-caption">
               <h1>What will countries export next?</h1>
-              <p>Explore predictions based on trade relationships, global supply chains and underlying productive capabilities.</p>
+              <p>Explore predictions based on the productive structures of similar countries.</p>
               <p><a class="btn btn-lg btn-primary" href="dashboard.html" role="button">Find out</a></p>
             </div>
           </div>
@@ -116,20 +113,20 @@
       <div class="row">
         <div class="col-lg-4">
           <img class="img-circle" src="images/math-1547018_1280.jpg" alt="Generic placeholder image" width="140" height="140">
-          <h2>About the Model</h2>
-          <p>Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo cursus magna.</p>
+          <h2>About</h2>
+          <p>The Export Predictor uses machine learning to help policy makers identify economically viable industries.</p>
           <p><a class="btn btn-default" href="#" role="button">Read more &raquo;</a></p>
         </div><!-- /.col-lg-4 -->
         <div class="col-lg-4">
           <img class="img-circle" src="images/world-1264062_1280.jpg" alt="Generic placeholder image" width="140" height="140">
           <h2>Country Proximity</h2>
-          <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</p>
+          <p>Visualise networks of similar countries based on goods exchanged with particular trading partners.</p>
           <p><a class="btn btn-default" href="networks.html" role="button">View &raquo;</a></p>
         </div><!-- /.col-lg-4 -->
         <div class="col-lg-4">
           <img class="img-circle" src="images/map-428639_1280.jpg" alt="Generic placeholder image" width="140" height="140">
           <h2>Predictions</h2>
-          <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+          <p>What’s the probability of a country  entering a particular export industry over the next three years?</p>
           <p><a class="btn btn-default" href="dashboard.html" role="button">View &raquo;</a></p>
         </div><!-- /.col-lg-4 -->
       </div><!-- /.row -->
@@ -137,7 +134,7 @@
 
       <!-- FOOTER -->
       <footer>
-        <p>Trade Explorer was created by Peter Richens
+        <p>The Export Predictor was created by Peter Richens
           <a href="https://sg.linkedin.com/pub/peter-richens/31/bb0/b9a" target="_blank">
           <img src="https://static.licdn.com/scds/common/u/img/webpromo/btn_liprofile_blue_80x15.png" width="80" height="15" border="0" alt="View Peter Richens's profile on LinkedIn">
           </a>

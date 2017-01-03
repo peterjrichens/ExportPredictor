@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>About Export Predictor</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="css/blog.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="lib/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="lib/css/keen-dashboards.css" />
+    <link rel="icon" type="image/vnd.microsoft.icon" href="images/Gakuseisean-Ivista-2-Network-Globe-Connected.ico">
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="">About the Export Predictor</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-left">
+            <li><a href="https://peterjrichens.github.io/TradeExplorer/">Home</a></li>
+            <li><a href="networks.html">Country Proximity</a></li>
+            <li><a href="dashboard.html">Export Predictions</a></li>
+            <li><a href="https://github.com/peterjrichens/TradeExplorer">Source Code</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div class="blog-header">
+        <h1 class="blog-title"></h1>
+        <p class="lead blog-description"></p>
+      </div>
+
+      <div class="row">
+
+        <div class="col-sm-8 blog-main">
+
+          <div class="blog-post">
+            <h2>About the Export Predictor</h2>
+            <a name="intro"></a>
+            <h3>Introduction</h3>
+            <p>
+              Acquiring productive capabilities in a wider range of goods
+              is a key driver of economic growth and development. Countries typically
+              diversify their economies as they pull out of poverty and only
+              start to specialise (and innovate) at a relatively late stage of the development
+              process — a pattern well documented in terms of
+              <a href="http://www.ingentaconnect.com/content/aea/aer/2003/00000093/00000001/art00004" target="_blank">production, employment</a> and
+              <a href="http://www.mitpressjournals.org/doi/abs/10.1162/REST_a_00078#.WGYYERJ95hE" target="_blank">exports</a>.
+            </p>
+            <p>
+              Developing countries must learn to produce and export new products,
+              but most economists warn not to try ‘picking winners’ and
+              <a href="http://hajoonchang.net/wp-content/uploads/2012/01/DPRLin-Changdebate.pdf" target="_blank">do not agree</a>
+              whether industrial policy should conform to or defy comparative advantage.
+              Yet policy makers need to prioritise
+              <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1824519" target="_blank">limited</a>
+              administrative capabilities. A prerequiste for a successful
+              industrial policy is the identification of new industries that are
+              (or can become) economically feasible  —
+              areas of ‘latent comparative advantage’.
+            </p>
+            <p>
+              So how can policy makers identify these
+              sectors? Justin Lin's
+              <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1611526" target="_blank">
+                Growth Identification and Facilitation</a> framework proposes a simple
+                if ad-hoc approach, which is probably followed in some form by most
+                countries:
+              <p>
+                <blockquote>
+                The government in a developing country can identify the list of tradeable
+                goods and services that have been produced for about
+                20 years in dynamically growing countries with similar endowment
+                structures and a per capita income that is about 100% higher than
+                their own.
+              </blockquote>
+            </p>
+            <p>
+              Research into Economic Complexity may provide
+              a more data-driven solution. The
+              <a href="http://atlas.media.mit.edu/en/visualize/network/hs92/export/usa/all/show/2014/" target="_blank">
+                product space </a> maps out
+              the network of possible exports and the paths of productive knowledge
+              between then. Policy makers can then restrict their attention to
+              industries that are close to their current productive structure but
+              offer the opportunity to move into denser areas of the
+              product space.
+            </p>
+            <p>
+              The Export Predictor applies the intuition of Lin's
+              approach in a systemic manner inspired by the product space.
+              Rather than measuring the distance between products, the focus is
+              the proximity of countries. Economically feasible industries are
+              identified based on the comparative advantage of ‘nearby’ countries.
+              Multiple measures of country distance are combined in a machine
+              learning model trained to predict export discoveries.
+            </p>
+            <a name="proximity"></a>
+            <h3>Country proximity</h3>
+            <p>
+              The <a href="https://comtrade.un.org/" target="_blank">UN Comtrade Database</a>
+              is used to measure distance between countries along the following dimensions:
+            </p>
+            <ul>
+              <li><strong>Products exported</strong> (how similar countries are in terms of
+                the products they export).</li>
+              <li><strong>Products imported</strong> (how similar countries are in terms of
+                  the products they import).</li>
+              <li><strong>Destination of exports</strong> (how similar countries are in terms
+                  the countries they export to).</li>
+              <li><strong>Origin of imports</strong> (how similar countries are in terms
+                  the countries they import from).</li>
+              <li><strong>Bilateral trade intensity</strong> (the value of trade between two
+                  countries, normalised by their share of global trade).</li>
+              <li><strong>Geographic distance</strong> (the number of kilometers between each capital
+                city).</li>
+           </ul>
+           <p>
+             The network of country promixity according to each measure is visualised
+             <a href="networks.html" target="_blank">here</a>.
+           </p>
+           <a name="predictions"></a>
+           <h3>Export predictions</h3>
+           <p>
+             The objective is to predict ‘export discoveries’. To limit
+             noise in the data, a country is considered to
+             have discovered a new product after exporting it for three
+             consecutive years. Likewise, only products not exported for three
+             consecutive years are considered potential new discoveries. UN
+             Comtrade data is used to identify all export discoveries over the last
+             two decades based on this definition.
+           </p>
+           <p>
+             To train a machine learning model, first the
+             neighbours of each country (according to the proximity measures defined above)
+             are ranked. The
+             <span class="gTerm" style="cursor:help;"
+             title="revealed comparative advantage is defined as the share of a country's exports accounted for by a product, normalised by that product's share in global trade.">
+             comparative advantage</span>
+             of each neighbour in each potential new export is then computed.
+             To increase predictive power and tractibility,
+             the comparative advantage of all the neighbours is projected on to the
+             most discriminative direction with respect to export discoveries
+             in the previous time period (using Linear Discrimiants Analaysis).
+             The model also takes account of the past export discovery rate
+             for each country and product.
+           </p>
+           <p>
+             <a href="https://github.com/dmlc/xgboost" target="_blank">XGBoost</a>
+             is used to predict the probability of a given country discovering
+             a given product over the next three years. The predictions can be
+             explored
+             <a href="dashboard.html" target="_blank">here</a>.
+           </p>
+           <a name="evaluation"></a>
+           <h3>Model evaluation</h3>
+           <p>
+             The emergence of new export industries is relatively rare: the
+             discovery rate is around 3%. The probability ranking across products
+             or countries is as or more important than obtaining a correct binary
+             classification (export discovery or not). In these situations, the
+             <a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic" target="_blank">
+             receiver operating characteristic (ROC)</a> curve is often used
+             to evalate a model’s predictions. This a a plot of
+             the true-positive rate against the false positive rate at different
+             discrimination (probability) thresholds.
+           </p>
+           <p>
+            For example, the ROC curve below was generated by training the model on
+            data from 1996 to 2012 and evaluating its predictions against the actual
+            new exports between 2013 and 2015. The potential new
+            exports with a predicted probability of at least 3%
+            include almost all of the true positives (products that were indeed
+            discovered). However, almost 20% of these products were not discovered
+            (were false positives). Using a higher threshold will eliminate
+            most false positives, but at the cost of excluding products that
+            were discovered.
+           </p>
+           <img width="700" src="images/roc_curve_no_labels.png" onmouseover="hover(this);" onmouseout="unhover(this);" />
+           <p>
+             The area under the ROC curve (AUC) provides a measure of the model’s
+             overall performance, or more specically how well it ranks the
+             proability of each potential new export. An AUC of 0.5 indicates the model is no better
+             than a random guess, whereas a score of 1 indicates no false positives
+             and no false negatives. When evaluated with new data, the export
+             prediction model scores around 0.95 (see chart below). This means
+             that 95% of the time a randomly chosen product
+             that is discovered will have a higher predicted probability than
+             a randomly chosen product that is not. The model’s performance
+             continues to improve as more data becomes available, providing
+             assurance that future predictions will be no less reliable.
+            <img width="700" src="images/Leave-last-year-out cross validation.png"/>
+           </p>
+           <a name="modifications"></a>
+
+           <h3>Possible modifications</h3>
+           <p>
+             The Export Predictor was designed for policy makers in developing
+             countries. The model does not generate useful predictions for
+             industrialised and large emerging economies that already
+             export most of the (around 1,200) products in the database. But the
+             <a href="https://github.com/peterjrichens/TradeExplorer" target="_blank">source code</a>
+             could be modified with these types of country in mind. For example:
+           </p>
+           <ul>
+             <li>The definition of a product discovery could be changed to only
+                 consider exports above a certain threshold or with revealed
+                 comparative advantage.</li>
+             <li>The model could be re-trained using more dissaggregated data, for
+                 example HS 6-digit level of classfiication rather than the
+                 4-digit level currently used.</li>
+          </ul>
+
+          </div><!-- /.blog-post -->
+        </div><!-- /.blog-main -->
+
+        <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+          <div id="nav-menu">
+          <div class="sidebar-module sidebar-module-inset">
+            <h4>Navigate</h4>
+            <p><a href="#intro">Introduction</a></p>
+            <p><a href="#proximity">Country proximity</a></p>
+            <p><a href="#predictions">Export predictions</a></p>
+            <p><a href="#evaluation">Model evaluation</a></p>
+            <p><a href="#modifications">Possible modifications</a></p>
+          </div>
+
+          <div class="sidebar-module">
+            <h4>Further reading</h4>
+            <ol class="list-unstyled">
+              <li><a href="http://rodrik.typepad.com/dani_rodriks_weblog/2007/05/specialization_.html" target="_blank">Specialization or diversification?</a></li>
+              <li><a href="http://atlas.cid.harvard.edu/explore/pie_scatter/export/uga/all/show/2014/" target="_blank">
+                Product feasbility and opportunity gain</a></li>
+            </ol>
+          </div>
+        </div><!-- /.blog-sidebar -->
+      </div><!-- /.nav-menu -->
+      </div><!-- /.row -->
+
+    </div><!-- /.container -->
+
+    <footer>
+      <p>The Export Predictor was created by Peter Richens
+        <a href="https://sg.linkedin.com/pub/peter-richens/31/bb0/b9a" target="_blank">
+        <img src="https://static.licdn.com/scds/common/u/img/webpromo/btn_liprofile_blue_80x15.png" width="80" height="15" border="0" alt="View Peter Richens's profile on LinkedIn">
+        </a>
+
+    </footer>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script>
+    function hover(element) {
+        element.setAttribute('src', "images/roc_curve.png");
+      }
+      function unhover(element) {
+        element.setAttribute('src', "images/roc_curve_no_labels.png");
+      }
+
+
+    </script>
+  </body>
+</html>
