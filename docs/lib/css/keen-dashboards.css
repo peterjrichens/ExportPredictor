@@ -33,8 +33,16 @@ body.application hr {
 }
 .navbar-inverse .navbar-nav > li > a,
 .navbar a.navbar-brand {
-  color: #fbfbfb;
+  color: #C0C0C0;
   text-decoration: none;
+}
+
+#navbar-selected {
+  color: #fbfbfb;
+}
+
+.navbar > a:hover {
+  color: #fbfbfb;
 }
 
 .chart-wrapper {

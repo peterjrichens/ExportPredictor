@@ -417,7 +417,7 @@ def get_wb(indictor, start_year, end_year):
     import datetime
     start_date = datetime.date(year=start_year, month=1, day=1)
     end_date = datetime.date(year=end_year, month=1, day=1)
-    series = wbdata.get_data(indicator = indictor, country = ctry_tup('iso',range(start_year,end_year)),
+    series = wbdata.get_data(indicator = indictor, country = ctry_tup('iso',range(start_year,end_year+1)),
                      data_date=(start_date,end_date),pandas=True)
     df = series.to_frame(name = 'value').reset_index()
     df.rename(columns={'date': 'year'}, inplace=True)

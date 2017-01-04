@@ -37,14 +37,14 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="">About the Export Predictor</a>
+          <a class="navbar-brand" href="index.html">The Export Predictor</a>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-left">
-            <li><a href="https://peterjrichens.github.io/TradeExplorer/">Home</a></li>
+            <li><a id="navbar-selected" href="">About</a></li>
             <li><a href="networks.html">Country Proximity</a></li>
             <li><a href="dashboard.html">Export Predictions</a></li>
-            <li><a href="https://github.com/peterjrichens/TradeExplorer">Source Code</a></li>
+            <li><a href="https://github.com/peterjrichens/TradeExplorer" target="_blank">Source Code</a></li>
           </ul>
         </div>
       </div>
@@ -81,7 +81,7 @@
               whether industrial policy should conform to or defy comparative advantage.
               Yet policy makers need to prioritise
               <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1824519" target="_blank">limited</a>
-              administrative capabilities. A prerequiste for a successful
+              administrative capabilities. A prerequisite for a successful
               industrial policy is the identification of new industries that are
               (or can become) economically feasible  —
               areas of ‘latent comparative advantage’.
@@ -103,11 +103,10 @@
               </blockquote>
             </p>
             <p>
-              Research into Economic Complexity may provide
-              a more data-driven solution. The
-              <a href="http://atlas.media.mit.edu/en/visualize/network/hs92/export/usa/all/show/2014/" target="_blank">
-                product space </a> maps out
-              the network of possible exports and the paths of productive knowledge
+              Research into economic complexity may provide
+              a more data-driven solution. Global trade data is mined to
+              <a href="http://atlas.media.mit.edu/en/visualize/network/hs92/export/usa/all/show/2014/" target="_blank">map</a>
+              out the network of possible exports and the paths of productive knowledge
               between then. Policy makers can then restrict their attention to
               industries that are close to their current productive structure but
               offer the opportunity to move into denser areas of the
@@ -143,7 +142,7 @@
                 city).</li>
            </ul>
            <p>
-             The network of country promixity according to each measure is visualised
+             The networks of country proximity according to each measure are visualised
              <a href="networks.html" target="_blank">here</a>.
            </p>
            <a name="predictions"></a>
@@ -158,25 +157,25 @@
              two decades based on this definition.
            </p>
            <p>
-             To train a machine learning model, first the
-             neighbours of each country (according to the proximity measures defined above)
+             The neighbours of each country (according to the proximity measures defined above)
              are ranked. The
              <span class="gTerm" style="cursor:help;"
              title="revealed comparative advantage is defined as the share of a country's exports accounted for by a product, normalised by that product's share in global trade.">
              comparative advantage</span>
              of each neighbour in each potential new export is then computed.
-             To increase predictive power and tractibility,
+             To increase predictive power and tractability,
              the comparative advantage of all the neighbours is projected on to the
              most discriminative direction with respect to export discoveries
-             in the previous time period (using Linear Discrimiants Analaysis).
+             in the previous time period (using Linear Discriminants Analysis).
              The model also takes account of the past export discovery rate
              for each country and product.
            </p>
            <p>
+             Finally, a machine learning model based on
              <a href="https://github.com/dmlc/xgboost" target="_blank">XGBoost</a>
-             is used to predict the probability of a given country discovering
-             a given product over the next three years. The predictions can be
-             explored
+             is trained to predict the probability of a given country discovering
+             a given product. Predictions for the
+             next three years can be explored
              <a href="dashboard.html" target="_blank">here</a>.
            </p>
            <a name="evaluation"></a>
@@ -188,14 +187,14 @@
              classification (export discovery or not). In these situations, the
              <a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic" target="_blank">
              receiver operating characteristic (ROC)</a> curve is often used
-             to evalate a model’s predictions. This a a plot of
+             to evaluate a model’s predictions. This a plot of
              the true-positive rate against the false positive rate at different
-             discrimination (probability) thresholds.
+             discrimination (probability) thresholds, using out-of-sample data.
            </p>
            <p>
             For example, the ROC curve below was generated by training the model on
             data from 1996 to 2012 and evaluating its predictions against the actual
-            new exports between 2013 and 2015. The potential new
+            export discoveries between 2013 and 2015. The potential new
             exports with a predicted probability of at least 3%
             include almost all of the true positives (products that were indeed
             discovered). However, almost 20% of these products were not discovered
@@ -206,10 +205,10 @@
            <img width="700" src="images/roc_curve_no_labels.png" onmouseover="hover(this);" onmouseout="unhover(this);" />
            <p>
              The area under the ROC curve (AUC) provides a measure of the model’s
-             overall performance, or more specically how well it ranks the
-             proability of each potential new export. An AUC of 0.5 indicates the model is no better
+             overall performance, or more specifically how well it ranks the
+             probabilities of potential exports. An AUC of 0.5 indicates the model is no better
              than a random guess, whereas a score of 1 indicates no false positives
-             and no false negatives. When evaluated with new data, the export
+             and no false negatives. When evaluated with the most recent data, the export
              prediction model scores around 0.95 (see chart below). This means
              that 95% of the time a randomly chosen product
              that is discovered will have a higher predicted probability than
@@ -234,7 +233,7 @@
                  consider exports above a certain threshold or with <span class="gTerm" style="cursor:help;"
                 title="the share of a country's exports accounted for by a product, normalised by that product's share in global trade.">
                 revealed comparative advantage</span>.</li>
-             <li>The model could be re-trained using more dissaggregated data, for
+             <li>The model could be re-trained using more disaggregated data, for
                  example HS 6-digit level of classification rather than the
                  4-digit level currently used.</li>
           </ul>

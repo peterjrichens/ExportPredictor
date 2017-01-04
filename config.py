@@ -1,8 +1,8 @@
 # postgres login details
 
-username = ''
-password = ''
-dbname = ''
+username = 'peter'
+password = '1910'
+dbname = 'peter'
 
 
 SQLALCHEMY_DATABASE_URI = 'postgresql://%s:%s@localhost/%s' % (username, password, dbname)
