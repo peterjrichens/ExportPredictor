@@ -107,9 +107,9 @@ function showPredictions(error, data) {
       if (string = undefined) {var string = "Try predicting comparative advantage."};
       document.getElementById('tree-notes').innerHTML = string;
     };
-  treeNote('select country', selectedCtry, target);
+  treeNote(mapMode, selectedCtry, target);
 
-  function mapNote(target){
+  function mapNote(target, mode){
     if (target==1 && mode=='select product') {var string = "Greyed-out countries have insufficient data to generate predictions, usually because they already export most products. Try predicting comparative advantage."}
     else {var string =''};
     document.getElementById('map-notes').innerHTML = string;
@@ -225,6 +225,7 @@ updateTable('select country', selectedCtry);
                 updateMap('select product', target, selectedCmd)
                 }
             },
+        "type": 'toggle',
         "value": ['Browse by country', 'Browse by product']
         },
         {
