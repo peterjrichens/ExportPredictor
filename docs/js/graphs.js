@@ -84,7 +84,7 @@ function showPredictions(error, data) {
       if (mode == 'select country'){
         var count = countryData(selection, target).length.toString()
         if (target == 2) {
-            var string = "There are ".concat(count).concat(" products ").concat(selection).concat(" may develop comparative advantage in."
+            var string = "There are ".concat(count).concat(" products ").concat(selection).concat(" may develop comparative advantage in.");
         } else {
         if (count == 1) {var string = "There is only 1 product ".concat(selection).concat(" has not exported. Try predicting comparative advantage.");
         }
@@ -95,8 +95,8 @@ function showPredictions(error, data) {
       if (mode == 'select product'){
         var count = cmdData(selection, target).length.toString()
         if (target==2) {
-            if (count==1) {var string = count.concat(" country may develop comparative advantage in ").concat(selection}
-            else {var string = count.concat(" countries may develop comparative advantage in ").concat(selection}
+            if (count==1) {var string = count.concat(" country may develop comparative advantage in ").concat(selection);}
+            else {var string = count.concat(" countries may develop comparative advantage in ").concat(selection);}
         } else {
         if (count == 1) {var string = "Only 1 country has not exported ".concat(selection).concat('.');
         } else {var string = count.concat(" countries have not exported ").concat(selection).concat('.');};
