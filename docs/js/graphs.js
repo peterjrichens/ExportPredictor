@@ -184,7 +184,7 @@ updateTable('select country', selectedCtry);
     .title("Select a country")
     .data(Data(data, target))
     .coords({
-       // "mute": ["010"], //hide Antartica
+       "mute": ["010"], //hide Antartica
         "value":"https://d3js.org/world-50m.v1.json",
         "projection": "equirectangular"
         })
