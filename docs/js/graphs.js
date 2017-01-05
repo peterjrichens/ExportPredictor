@@ -171,11 +171,12 @@ updateTable('select country', selectedCtry);
     .ui([{
         "method": function(value) {
             target = value;
+            console.log(target)
             updateTree(mapMode, selectedCmd);
             updateTable(mapMode, selectedCmd);
             updateMap(mapMode);},
-        "label": "Predict:",
-        "value": [{'Exports': 1}, {'Comparative advantage': 2}]
+        "type": 'toggle',
+        "value": [{'Predict exports': 1}, {'Predict comparative advantage': 2}]
         },
         {
         "method": function(value) {
