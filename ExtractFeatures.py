@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from tqdm import tqdm
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.neighbors import DistanceMetric
 from math import radians
@@ -18,8 +19,8 @@ DB_END_YR = max(db_yrs)[0]
 DB_YR_RANGE = range(DB_START_YR, DB_END_YR+1)
 
 # definition of new export:
-NB_YRS_NOT_EXPORTED = 3
-NB_YRS_EXPORTED = 3
+NB_YRS_NOT_EXPORTED = 3 # number of consecutive years a product must not be exported to be considered a potential new export
+NB_YRS_EXPORTED = 3 # number of consecutive years a potential export must be exported to be considered a new export
 NEW_EXPORT_START_YR = DB_START_YR + NB_YRS_NOT_EXPORTED # cannot be classified as new export before this year
 NEW_EXPORT_END_YR = DB_END_YR - NB_YRS_EXPORTED + 1 # cannot be classified as new export after this date
 NEW_EXPORT_YR_RANGE = range(NEW_EXPORT_START_YR, NEW_EXPORT_END_YR+1)
@@ -70,8 +71,6 @@ FEATURES are computed as follows:
         average_cmd:        The average discovery rate across countries for product p in the previous time period.
 
 '''
-
-
 def has_export(yr_range=DB_YR_RANGE):
     # returns dataframe. rows: origin-commodity, columns: years
     query = '''select countries.code as origin, commodities.code as cmd
@@ -92,6 +91,43 @@ def has_export(yr_range=DB_YR_RANGE):
         has_export[col] = has_export[col].apply(lambda x: int(x))
     return has_export
 
+def has_rca(yr_range=DB_YR_RANGE):
+    # returns dataframe. rows: origin-commodity, columns: years
+    # Country i is said to 'export' product p if RCA > 1 or: X_i,p / X_i > X_world,p / X_world
+    query = '''select countries.code as origin, commodities.code as cmd
+                from countries cross join commodities
+                order by origin, cmd
+            '''
+    has_export = pd.read_sql(query, engine)
+    print "finding 'exports'..."
+    for yr in tqdm(yr_range):
+        query = '''
+                            select origin, cmd, 1 as has_export_%s
+                            from
+                            (select origin, cmd,
+                            ((0.0+value)/sum(value) over w1)/((0.0+sum(value) over w2)/sum(value) over ()) as rca
+                            from (
+                              select origin, cmd, sum(value) as value
+                              from comtrade
+                              where yr = %d
+                              group by origin, cmd
+                            ) as sum_over_destination
+
+                            window w1 as (
+                                partition by origin
+                            ), w2 as (
+                                partition by cmd
+                            )
+                            order by origin, cmd) as t
+                            where rca >= 1
+                            ''' % (yr, yr)
+        df = pd.read_sql(query, engine)
+        df['has_export_%s'%yr] = df['has_export_%s'%yr].apply(lambda x: int(x))
+        has_export = has_export.merge(df, how='left', on=['origin', 'cmd']).fillna(0)
+    for col in [col for col in has_export.columns if 'has_export' in col]:
+        has_export[col] = has_export[col].apply(lambda x: int(x))
+    return has_export
+
 def get_new_exports(has_export_df):
     '''
     Loops through has_export_df looking for origin-cmd combinations not exported in for 3 (by default) consecutive years, then checks
@@ -102,7 +138,8 @@ def get_new_exports(has_export_df):
     '''
     has_export_columns = [col for col in has_export_df.columns if 'has_export' in col]
     new_exports = {}
-    for _, row in has_export_df.iterrows():
+    print "finding 'new exports'..."
+    for _, row in tqdm(has_export_df.iterrows()):
         origin = row['origin']
         cmd = row['cmd']
         check_forward = False
@@ -383,19 +420,18 @@ class FeaturesByYr(object):
         neighbours = neighbours.reindex(index=neighbours.index, method='ffill')
         return neighbours
 
-def build_ml_db(new_exports):
+def build_ml_db(new_exports, db_name):
     # builds postgres database containing final machine learning dataset
     origin_average = origin_cmd_average(new_exports, 'origin')
     cmd_average = origin_cmd_average(new_exports, 'cmd')
 
-    query_database = pd.read_sql('select count(*) as nb_rows, max(year) as last_yr from mldataset', engine)
-    #nb_rows = query_database.nb_rows.values[0]
-    #last_yr = query_database.last_yr.values[0]
-    #if nb_rows == 0:
-    #    start = NEW_EXPORT_START_YR
-    #else:
-    #    start = last_yr + 1
-    start = NEW_EXPORT_START_YR
+    query_database = pd.read_sql('select count(*) as nb_rows, max(year) as last_yr from %s' % db_name, engine)
+    nb_rows = query_database.nb_rows.values[0]
+    last_yr = query_database.last_yr.values[0]
+    if nb_rows == 0:
+        start = NEW_EXPORT_START_YR
+    else:
+        start = last_yr + 1
     for yr in range(start, NEW_EXPORT_END_YR+1):
         train_by_yr = new_exports[new_exports.year == yr]
         for feature in FEATURES:
@@ -409,10 +445,10 @@ def build_ml_db(new_exports):
             train_by_yr.rename(columns={0: '%s' %feature}, inplace=True)
         train_by_yr = merge_origin_cmd_averages(train_by_yr, origin_average, cmd_average)
         train_by_yr['year'] = train_by_yr['year'] + 2 # name period (yr,yr+1,yr+2) as last year not first year
-        train_by_yr = clean_df_db_dups(train_by_yr, 'mldataset', engine, dup_cols=['origin', 'cmd', 'year'])
+        train_by_yr = clean_df_db_dups(train_by_yr, db_name, engine, dup_cols=['origin', 'cmd', 'year'])
         if len(train_by_yr) > 0:
             print 'appending training data for %d to %d to database' % (yr - 1, yr + 1)
-            train_by_yr.to_sql(name='mldataset', if_exists='append', con=engine, index=False)
+            train_by_yr.to_sql(name=db_name, if_exists='append', con=engine, index=False)
 
     # generate X_test set for prediction
     test = new_exports[new_exports.year == NEW_EXPORT_END_YR]
@@ -427,11 +463,11 @@ def build_ml_db(new_exports):
     test['year'] = test['year'] + 1 # want to generate predictions for next period
     test = merge_origin_cmd_averages(test, origin_average, cmd_average)
     test['year'] = test['year'] + 2 # name period (yr,yr+1,yr+2) as last year not first year
-    test = clean_df_db_dups(test, 'mldataset', engine, dup_cols=['origin', 'cmd', 'year'])
+    test = clean_df_db_dups(test, db_name, engine, dup_cols=['origin', 'cmd', 'year'])
     test = test.drop('new_export', axis=1)
     if len(test) > 0:
         print 'appending X_test data for %d to %d to database' % (NEW_EXPORT_END_YR, DB_END_YR)
-        test.to_sql(name='mldataset', if_exists='append', con=engine, index=False)
+        test.to_sql(name=db_name, if_exists='append', con=engine, index=False)
 
 def lda(df, target_col='new_export'):
     # reduces the dimensionality of (rca_neighbour_1 .. rca_neighbour_N) by projecting it to the most discriminative direction
@@ -460,5 +496,10 @@ if __name__ == "__main__":
 
     has_export = has_export()
     new_exports = get_new_exports(has_export)
-    build_ml_db(new_exports)
+    build_ml_db(new_exports, 'mldataset')
+
+    has_rca = has_rca()
+    new_rca = get_new_exports(has_rca)
+    build_ml_db(new_rca, 'mldataset2')
+
 

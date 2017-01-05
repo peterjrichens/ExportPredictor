@@ -99,8 +99,6 @@ class MLDataset(db.Model):
     import_origin = db.Column(db.Float)
     market_share = db.Column(db.Float)
     distance = db.Column(db.Float)
-
-
     origin_average = db.Column(db.Float)
     cmd_average = db.Column(db.Float)
 
@@ -120,6 +118,10 @@ class MLDataset(db.Model):
         self.origin_average = origin_average
         self.cmd_average = cmd_average
 
+# database for an alternative definition of 'new export'
+class MLDataset2(MLDataset, db.Model):
+    __tablename__ = "mldataset2"
+    pass
 
 
 
