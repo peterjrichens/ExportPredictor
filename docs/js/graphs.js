@@ -71,7 +71,7 @@ function showPredictions(error, data) {
      if (target == 1) {
         return "Products ".concat(Country).concat(" may start exporting");};
      if (target == 2) {
-        return "Products ".concat(Country).concat(" may develop comparative advantage in");};
+        return "Products where ".concat(Country).concat(" may develop comparative advantage");};
   }
 
   function productTitle(cmd, target) {
@@ -87,7 +87,7 @@ function showPredictions(error, data) {
       if (mode == 'select country'){
         var count = countryData(selection, target).length.toString()
         if (target == 2) {
-            var string = "There are ".concat(count).concat(" products ").concat(selection).concat(" may develop comparative advantage in.");
+            var string = "There are ".concat(count).concat(" products where ").concat(selection).concat(" may develop comparative advantage.");
         } else {
         if (count == 1) {var string = "There is only 1 product ".concat(selection).concat(" has not exported. Try predicting comparative advantage.");
         }
@@ -135,7 +135,7 @@ function showPredictions(error, data) {
 function updateTree(mode, selection, target){
     if (mode == 'select country'){
         var ctryD = countryData(selection, target);
-        tree.id(['category','SubCategory','product'])
+        tree.id(['category','product'])
         tree.title(ctryTitle(selection, target));
         tree.data(ctryD).draw();
     }
@@ -184,7 +184,7 @@ updateTable('select country', selectedCtry);
     .title("Select a country")
     .data(Data(data, target))
     .coords({
-        "mute": ["010"], //hide Antartica
+       // "mute": ["010"], //hide Antartica
         "value":"https://d3js.org/world-50m.v1.json",
         "projection": "equirectangular"
         })
