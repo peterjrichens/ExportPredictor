@@ -34,6 +34,7 @@ function showPredictions(error, data) {
           return d.target == target;})
   };
 
+  var mapMode ='select country'
 
   var countryData = function (ctry) {
     return Data(data, target).filter(function(d){
