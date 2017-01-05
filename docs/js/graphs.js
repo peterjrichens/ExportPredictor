@@ -66,14 +66,14 @@ function showPredictions(error, data) {
           return d.product == cmd;})
   };
 
-  function ctryTitle(Country) {
+  function ctryTitle(Country, target) {
      if (target == 1) {
         return "Products ".concat(Country).concat(" may start exporting");};
      if (target == 2) {
         return "Products ".concat(Country).concat(" may develop comparative advantage in");};
   }
 
-  function productTitle(cmd) {
+  function productTitle(cmd, target) {
         if (target == 1) {
             return "Countries likely to start exporting ".concat(cmd);};
         if (target == 2) {
@@ -115,7 +115,7 @@ function showPredictions(error, data) {
 
   var tree = d3plus.viz()
     .container("#tree")
-    .title(ctryTitle(selectedCtry))
+    .title(ctryTitle(selectedCtry, target))
     .data(countryData(selectedCtry, target))
     .type("tree_map")
     .id(['category','SubCategory','product'])
@@ -133,13 +133,13 @@ function updateTree(mode, selection, target){
     if (mode == 'select country'){
         var ctryD = countryData(selection, target);
         tree.id(['category','SubCategory','product'])
-        tree.title(ctryTitle(selection));
+        tree.title(ctryTitle(selection, target));
         tree.data(ctryD).draw();
     }
     if (mode == 'select product'){
         var cmdD = cmdData(selection, target);
         tree.id('Country')
-        tree.title(productTitle(selection));
+        tree.title(productTitle(selection, target));
         tree.data(cmdD).draw();
     }
     treeNote(mode, selection, target);
@@ -160,7 +160,7 @@ function updateTable(mode, selection, target){
         var height = 30*(ctryD.length+1); // 30 pixels for each row including header
         table.id('cmd')
         table.cols({"value": ['category','product','probability'],"index":false})
-        table.title(ctryTitle(selection));
+        table.title(ctryTitle(selection, target));
         table.height(height);
         table.data(ctryD)//.draw();
     }
@@ -169,7 +169,7 @@ function updateTable(mode, selection, target){
         var height = 30*(cmdD.length+1); // 30 pixels for each row including header
         table.id('origin')
         table.cols({"value": ['Country','probability'],"index":false})
-        table.title(productTitle(selection));
+        table.title(productTitle(selection, target));
         table.height(height);
         table.data(cmdD)//.draw();
     }
@@ -215,8 +215,7 @@ updateTable('select country', selectedCtry);
                 var mapMode ='select country'};
             if (value=='Browse by product'){
                 var mapMode ='select product';
-                map.title(productTitle(selectedCmd));
-                map.data(cmdData(selectedCmd, target));
+                map.title(productTitle(selectedCmd, target));
                 updateTree(mapMode, selectedCmd, target);
                 updateTable(mapMode, selectedCmd, target);
                 }
@@ -228,7 +227,7 @@ updateTable('select country', selectedCtry);
         "method": function(value, map) {
             selectedCmd = value
             var mapMode = 'select product'
-            map.title(productTitle(selectedCmd));
+            map.title(productTitle(selectedCmd, target));
             map.data(cmdData(selectedCmd, target));
             updateMap('select product', target);
             updateTree(mapMode, selectedCmd, target);
@@ -259,8 +258,8 @@ updateTable('select country', selectedCtry);
 
 
     function updateMap(mode, target, selectedCtry){
-         map.data(Data(data, target));
          if (mode =='select country') {
+            map.data(Data(data, target));
             map.title('Select a country');
             map.color("Country");
             map.draw();
@@ -268,6 +267,7 @@ updateTable('select country', selectedCtry);
             updateTable(mode, selectedCtry, target);
         };
         if (mode =='select product') {
+            map.data(cmdData(selectedCmd, target));
             map.color("probability");
             map.color("probability");
             map.tooltip("probability");
