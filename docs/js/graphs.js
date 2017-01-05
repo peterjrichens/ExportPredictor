@@ -104,6 +104,7 @@ function showPredictions(error, data) {
         if (count == 1) {var string = "Only 1 country has not exported ".concat(selection).concat('.');
         } else {var string = count.concat(" countries have not exported ").concat(selection).concat('.');};
       }}
+      if (string = undefined) {var string = "Try predicting comparative advantage."};
       document.getElementById('tree-notes').innerHTML = string;
     };
   treeNote('select country', selectedCtry, target);
@@ -188,9 +189,9 @@ updateTable('select country', selectedCtry);
         "projection": "equirectangular"
         })
     .type("geo_map")
-    //.id("origin")
+    .id("origin")
     .color("Country")
-    //.text({value: "Country", mute:["Kyrgyzstan","Mozambique"]}) //some issue with these two countries
+    .text({value: "Country", mute:["Kyrgyzstan","Mozambique"]}) //some issue with these two countries
     .focus(undefined, ctrySelectAction)
     .ui([{
         "method": function(value) {
