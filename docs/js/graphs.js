@@ -218,7 +218,12 @@ updateTable('select country', selectedCtry);
                 updateTable(mapMode, selectedCmd, target);
                 updateMap(mapMode, target, selectedCmd)
                 }
-            updateMap(mapMode, target, selectedCtry);},
+            updateMap(mapMode, target, selectedCtry);
+            console.log(target);
+            console.log(mapMode);
+            console.log(selectedCmd);
+            console.log(selectedCtry);
+            },
         "value": ['Browse by country', 'Browse by product']
         },
         {
@@ -253,6 +258,10 @@ updateTable('select country', selectedCtry);
                 updateTable(mapMode, selectedCtry, target);
                 map.title("Click selected country to zoom out");
                 }
+            console.log(target);
+            console.log(mapMode);
+            console.log(selectedCmd);
+            console.log(selectedCtry);
             };
 
 
