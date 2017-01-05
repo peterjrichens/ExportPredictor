@@ -34,7 +34,9 @@ function showPredictions(error, data) {
           return d.target == target;})
   };
 
-  //var mapMode = 'select country'
+ if (mapMode == undefined) {
+    var mapMode = 'select country';
+ };
 
   function countryData(ctry, target) {
     return Data(data, target).filter(function(d){
@@ -211,7 +213,6 @@ updateTable('select country', selectedCtry);
         "method": function(value) {
             if (value=='Browse by country'){
                 var mapMode ='select country'};
-
             if (value=='Browse by product'){
                 var mapMode ='select product';
                 map.title(productTitle(selectedCmd));
@@ -248,7 +249,7 @@ updateTable('select country', selectedCtry);
             };
             var ctry_name = countryNameFromCode(ctry_id);
             if (ctry_name != 'n/a'){
-                selectedCtry = ctry_name
+                var selectedCtry = ctry_name
                 var mapMode = 'select country';
                 updateTree(mapMode, selectedCtry, target);
                 updateTable(mapMode, selectedCtry, target);
