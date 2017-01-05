@@ -210,15 +210,14 @@ updateTable('select country', selectedCtry);
                 mapMode ='select country'
                 updateTree(mapMode, selectedCtry, target);
                 updateTable(mapMode, selectedCtry, target);
-                updateMap(mapMode, target, selectedCtry)
+                updateMap('select country', target, selectedCtry)
                 };
             if (value=='Browse by product'){
                 mapMode ='select product';
                 updateTree(mapMode, selectedCmd, target);
                 updateTable(mapMode, selectedCmd, target);
-                updateMap(mapMode, target, selectedCmd)
+                updateMap('select product', target, selectedCmd)
                 }
-            updateMap(mapMode, target, selectedCtry);
             console.log(target);
             console.log(mapMode);
             console.log(selectedCmd);
@@ -236,6 +235,10 @@ updateTable('select country', selectedCtry);
             updateMap('select product', target, selectedCmd);
             updateTree(mapMode, selectedCmd, target);
             updateTable(mapMode, selectedCmd, target);
+            console.log(target);
+            console.log(mapMode);
+            console.log(selectedCmd);
+            console.log(selectedCtry);
             },
         "type": "drop",
         "value": cmd_list
