@@ -104,13 +104,13 @@ function showPredictions(error, data) {
         if (count == 1) {var string = "Only 1 country has not exported ".concat(selection).concat('.');
         } else {var string = count.concat(" countries have not exported ").concat(selection).concat('.');};
       }}
-      if (string = undefined) {var string = "Try predicting comparative advantage."};
+      if (string == undefined) {var string = "Try predicting comparative advantage."};
       document.getElementById('tree-notes').innerHTML = string;
     };
   treeNote(mapMode, selectedCtry, target);
 
   function mapNote(target, mode){
-    if (target==1 && mode=='select product') {var string = "Greyed-out countries have insufficient data to generate predictions, usually because they already export most products. Try predicting comparative advantage."}
+    if (target==1 && mode =='select country') {var string = "Greyed-out countries have insufficient data to generate predictions, usually because they already export most products. Try predicting comparative advantage."}
     else {var string =''};
     document.getElementById('map-notes').innerHTML = string;
   }
