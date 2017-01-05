@@ -207,13 +207,13 @@ updateTable('select country', selectedCtry);
         {
         "method": function(value) {
             if (value=='Browse by country'){
-                var mapMode ='select country'
+                mapMode ='select country'
                 updateTree(mapMode, selectedCtry, target);
                 updateTable(mapMode, selectedCtry, target);
                 updateMap(mapMode, target, selectedCtry)
                 };
             if (value=='Browse by product'){
-                var mapMode ='select product';
+                mapMode ='select product';
                 updateTree(mapMode, selectedCmd, target);
                 updateTable(mapMode, selectedCmd, target);
                 updateMap(mapMode, target, selectedCmd)
@@ -225,7 +225,7 @@ updateTable('select country', selectedCtry);
         "width": 250,
         "method": function(value, map) {
             selectedCmd = value
-            var mapMode = 'select product'
+            mapMode = 'select product'
             //map.title(productTitle(selectedCmd, target));
             //map.data(cmdData(selectedCmd, target));
             updateMap('select product', target, selectedCmd);
@@ -247,8 +247,8 @@ updateTable('select country', selectedCtry);
             };
             var ctry_name = countryNameFromCode(ctry_id);
             if (ctry_name != 'n/a'){
-                var selectedCtry = ctry_name
-                var mapMode = 'select country';
+                selectedCtry = ctry_name
+                mapMode = 'select country';
                 updateTree(mapMode, selectedCtry, target);
                 updateTable(mapMode, selectedCtry, target);
                 map.title("Click selected country to zoom out");
