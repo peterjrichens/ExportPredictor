@@ -108,12 +108,19 @@ function showPredictions(error, data) {
     };
   treeNote('select country', selectedCtry, target);
 
+  function mapNote(target){
+    if (target==2) {var string = "Greyed-out countries have insufficient data to generate predictions, usually because they already export most products. Try predicting comparative advantage."}
+    else {var string =''};
+    document.getElementById('map-notes').innerHTML = string;
+  }
+
+
   var tree = d3plus.viz()
     .container("#tree")
     .title(ctryTitle(selectedCtry, target))
     .data(countryData(selectedCtry, target))
     .type("tree_map")
-    .id(['category','SubCategory','product'])
+    .id(['category', 'product'])
     .size('probability')
     .tooltip({"share":false})
     .ui([{
@@ -260,6 +267,7 @@ updateTable('select country', selectedCtry);
             map.draw();
             updateTree(mode, selection, target);
             updateTable(mode, selection, target);
+            mapNote(target);
         };
         if (mode =='select product') {
             map.focus(undefined); //zoom out if necessary
