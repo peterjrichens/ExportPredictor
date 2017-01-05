@@ -80,7 +80,7 @@ function showPredictions(error, data) {
 
   var selectedCtry = ctry_list[Math.floor(Math.random()*ctry_list.length)]; // start with ramdom ctry in ctry_list
 
-  function treeNote (mode, selection, target){
+  function treeNote(mode, selection, target){
       if (mode == 'select country'){
         var count = countryData(selection, target).length.toString()
         if (target == 2) {
@@ -103,7 +103,7 @@ function showPredictions(error, data) {
       }}
       document.getElementById('tree-notes').innerHTML = string;
     };
-  treeNote('select country', selectedCtry);
+  treeNote('select country', selectedCtry, target);
 
   var selectedCmd = cmd_list[Math.floor(Math.random()*cmd_list.length)];
 
@@ -124,7 +124,7 @@ function showPredictions(error, data) {
      }])
     .draw()
 
-function updateTree(mode, selection){
+function updateTree(mode, selection, target){
     if (mode == 'select country'){
         var ctryD = countryData(selection, target);
         tree.id(['category','SubCategory','product'])
@@ -137,7 +137,7 @@ function updateTree(mode, selection){
         tree.title(productTitle(selection));
         tree.data(cmdD).draw();
     }
-    treeNote(mode, selection);
+    treeNote(mode, selection, target);
 }
 
   var table = d3plus.viz()
@@ -197,10 +197,10 @@ updateTable('select country', selectedCtry);
                 updateTable(mapMode, selectedCtry, target);
             }
             if (mapMode=='select product') {
-                updateTree(mapMode, selectedCmd);
-                updateTable(mapMode, selectedCmd);
+                updateTree(mapMode, selectedCmd, target);
+                updateTable(mapMode, selectedCmd, target);
             }
-            updateMap(mapMode);},
+            updateMap(mapMode, target, selectedCtry);},
         "type": 'toggle',
         "value": [{'Predict exports': 1}, {'Predict comparative advantage': 2}]
         },
@@ -213,10 +213,10 @@ updateTable('select country', selectedCtry);
                 var mapMode ='select product';
                 map.title(productTitle(selectedCmd));
                 map.data(cmdData(selectedCmd, target));
-                updateTree(mapMode, selectedCmd);
-                updateTable(mapMode, selectedCmd);
+                updateTree(mapMode, selectedCmd, target);
+                updateTable(mapMode, selectedCmd, target);
                 }
-            updateMap(mapMode);},
+            updateMap(mapMode, target, selectedCtry);},
         "value": ['Browse by country', 'Browse by product']
         },
         {
@@ -226,9 +226,9 @@ updateTable('select country', selectedCtry);
             var mapMode = 'select product'
             map.title(productTitle(selectedCmd));
             map.data(cmdData(selectedCmd, target));
-            updateMap('select product');
-            updateTree(mapMode, selectedCmd);
-            updateTable(mapMode, selectedCmd);
+            updateMap('select product', target);
+            updateTree(mapMode, selectedCmd, target);
+            updateTable(mapMode, selectedCmd, target);
             },
         "type": "drop",
         "value": cmd_list
@@ -246,21 +246,22 @@ updateTable('select country', selectedCtry);
             var ctry_name = countryNameFromCode(ctry_id);
             if (ctry_name != 'n/a'){
                 var mapMode = 'select country';
-                updateTree(mapMode, ctry_name);
-                updateTable(mapMode, ctry_name);
+                updateTree(mapMode, ctry_name, target);
+                updateTable(mapMode, ctry_name, target);
                 map.title("Click selected country to zoom out");
                 }
             };
 
 
-    function updateMap(mode){
+    function updateMap(mode, target, selectedCtry){
+         map.data(Data(data, target));
          if (mode =='select country') {
             //var selectedCtry = ctry_list[Math.floor(Math.random()*ctry_list.length)];
             map.title('Select a country');
             map.color("Country");
-            map.data(data).draw();
-            updateTree(mode, selectedCtry);
-            updateTable(mode, selectedCtry);
+            map.draw();
+            updateTree(mode, selectedCtry, target);
+            updateTable(mode, selectedCtry, target);
         };
         if (mode =='select product') {
             map.color("probability");
