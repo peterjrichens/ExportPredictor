@@ -34,7 +34,7 @@ function showPredictions(error, data) {
           return d.target == target;})
   };
 
-  var mapMode = 'select country'
+  //var mapMode = 'select country'
 
   function countryData(ctry, target) {
     return Data(data, target).filter(function(d){
@@ -78,7 +78,9 @@ function showPredictions(error, data) {
             return "Countries likely to develop comparative advantage in ".concat(cmd);};
   }
 
-  var selectedCtry = ctry_list[Math.floor(Math.random()*ctry_list.length)]; // start with ramdom ctry in ctry_list
+ if (selectedCtry == undefined) {
+   var selectedCtry = ctry_list[Math.floor(Math.random()*ctry_list.length)]; // start with ramdom ctry in ctry_list
+ };
 
   function treeNote(mode, selection, target){
       if (mode == 'select country'){
@@ -105,8 +107,9 @@ function showPredictions(error, data) {
     };
   treeNote('select country', selectedCtry, target);
 
-  var selectedCmd = cmd_list[Math.floor(Math.random()*cmd_list.length)];
-
+ if (selectedCmd == undefined) {
+     var selectedCmd = cmd_list[Math.floor(Math.random()*cmd_list.length)];
+ };
 
   var tree = d3plus.viz()
     .container("#tree")
@@ -245,9 +248,10 @@ updateTable('select country', selectedCtry);
             };
             var ctry_name = countryNameFromCode(ctry_id);
             if (ctry_name != 'n/a'){
+                selectedCtry = ctry_name
                 var mapMode = 'select country';
-                updateTree(mapMode, ctry_name, target);
-                updateTable(mapMode, ctry_name, target);
+                updateTree(mapMode, selectedCtry, target);
+                updateTable(mapMode, selectedCtry, target);
                 map.title("Click selected country to zoom out");
                 }
             };
@@ -256,7 +260,6 @@ updateTable('select country', selectedCtry);
     function updateMap(mode, target, selectedCtry){
          map.data(Data(data, target));
          if (mode =='select country') {
-            //var selectedCtry = ctry_list[Math.floor(Math.random()*ctry_list.length)];
             map.title('Select a country');
             map.color("Country");
             map.draw();
