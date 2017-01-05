@@ -2,6 +2,12 @@ queue()
     .defer(d3.tsv, "predictions.csv")
     .await(showPredictions);
 
+// set initial value for global variables
+var selectedCtry = "Afghanistan"
+var selectedCmd = "Abrasive cloths, papers etc (including sandpaper)"
+var mapMode = 'select country';
+var target = 1 //{1: exports, 2: comparative advantage}
+
 
 function showPredictions(error, data) {
     if(error) { console.log(error); }
@@ -28,15 +34,10 @@ function showPredictions(error, data) {
  var cmd_list = cmds.map(i => i.key).sort()
  cmd_list.unshift('select a product'); //push placeholder to top
 
- var target = 1 // {1: exports, 2: comparative advantage}
  function Data(data, target) {
     return data.filter(function(d){
           return d.target == target;})
   };
-
- if (mapMode == undefined) {
-    var mapMode = 'select country';
- };
 
   function countryData(ctry, target) {
     return Data(data, target).filter(function(d){
@@ -80,9 +81,7 @@ function showPredictions(error, data) {
             return "Countries likely to develop comparative advantage in ".concat(cmd);};
   }
 
- if (selectedCtry == undefined) {
-   var selectedCtry = ctry_list[Math.floor(Math.random()*ctry_list.length)]; // start with ramdom ctry in ctry_list
- };
+
 
   function treeNote(mode, selection, target){
       if (mode == 'select country'){
@@ -108,10 +107,6 @@ function showPredictions(error, data) {
       document.getElementById('tree-notes').innerHTML = string;
     };
   treeNote('select country', selectedCtry, target);
-
- if (selectedCmd == undefined) {
-     var selectedCmd = cmd_list[Math.floor(Math.random()*cmd_list.length)];
- };
 
   var tree = d3plus.viz()
     .container("#tree")
@@ -212,12 +207,16 @@ updateTable('select country', selectedCtry);
         {
         "method": function(value) {
             if (value=='Browse by country'){
-                var mapMode ='select country'};
+                var mapMode ='select country'
+                updateTree(mapMode, selectedCtry, target);
+                updateTable(mapMode, selectedCtry, target);
+                updateMap(mapMode, target, selectedCtry)
+                };
             if (value=='Browse by product'){
                 var mapMode ='select product';
-                map.title(productTitle(selectedCmd, target));
                 updateTree(mapMode, selectedCmd, target);
                 updateTable(mapMode, selectedCmd, target);
+                updateMap(mapMode, target, selectedCmd)
                 }
             updateMap(mapMode, target, selectedCtry);},
         "value": ['Browse by country', 'Browse by product']
@@ -227,9 +226,9 @@ updateTable('select country', selectedCtry);
         "method": function(value, map) {
             selectedCmd = value
             var mapMode = 'select product'
-            map.title(productTitle(selectedCmd, target));
-            map.data(cmdData(selectedCmd, target));
-            updateMap('select product', target);
+            //map.title(productTitle(selectedCmd, target));
+            //map.data(cmdData(selectedCmd, target));
+            updateMap('select product', target, selectedCmd);
             updateTree(mapMode, selectedCmd, target);
             updateTable(mapMode, selectedCmd, target);
             },
@@ -257,21 +256,23 @@ updateTable('select country', selectedCtry);
             };
 
 
-    function updateMap(mode, target, selectedCtry){
+    function updateMap(mode, target, selection){
          if (mode =='select country') {
             map.data(Data(data, target));
             map.title('Select a country');
             map.color("Country");
             map.draw();
-            updateTree(mode, selectedCtry, target);
-            updateTable(mode, selectedCtry, target);
+            updateTree(mode, selection, target);
+            updateTable(mode, selection, target);
         };
         if (mode =='select product') {
-            map.data(cmdData(selectedCmd, target));
+            map.title(productTitle(selection, target));
+            map.data(cmdData(selection, target));
             map.color("probability");
             map.color("probability");
             map.tooltip("probability");
             map.draw();
+
         };
     }
 
