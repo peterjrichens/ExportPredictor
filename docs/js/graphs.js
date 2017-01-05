@@ -80,20 +80,27 @@ function showPredictions(error, data) {
 
   var selectedCtry = ctry_list[Math.floor(Math.random()*ctry_list.length)]; // start with ramdom ctry in ctry_list
 
-  function treeNote (mode, selection){
+  function treeNote (mode, selection, target){
       if (mode == 'select country'){
         var count = countryData(selection, target).length.toString()
+        if (target == 2) {
+            var string = "There are ".concat(count).concat(" products ").concat(selection).concat(" may develop comparative advantage in."
+        } else {
         if (count == 1) {var string = "There is only 1 product ".concat(selection).concat(" has not exported. Try predicting comparative advantage.");
         }
         if (count >1 && count < 20) {var string = "There are only ".concat(count).concat(" products ").concat(selection).concat(" has not exported. Try predicting comparative advantage.");
         }
         if (count >= 20) {var string = "There are ".concat(count).concat(" products ").concat(selection).concat(" has not exported.");};
-      }
+      }}
       if (mode == 'select product'){
         var count = cmdData(selection, target).length.toString()
+        if (target==2) {
+            if (count==1) {var string = count.concat(" country may develop comparative advantage in ").concat(selection}
+            else {var string = count.concat(" countries may develop comparative advantage in ").concat(selection}
+        } else {
         if (count == 1) {var string = "Only 1 country has not exported ".concat(selection).concat('.');
         } else {var string = count.concat(" countries have not exported ").concat(selection).concat('.');};
-      }
+      }}
       document.getElementById('tree-notes').innerHTML = string;
     };
   treeNote('select country', selectedCtry);
@@ -167,7 +174,7 @@ updateTable('select country', selectedCtry);
   var map = d3plus.viz()
     .container("#map")
     .title("Select a country")
-    .data(data)
+    .data(Data(data, target))
     .coords({
         "mute": ["010"], //hide Antartica
         "value":"https://d3js.org/world-50m.v1.json",
@@ -248,7 +255,7 @@ updateTable('select country', selectedCtry);
 
     function updateMap(mode){
          if (mode =='select country') {
-            var selectedCtry = ctry_list[Math.floor(Math.random()*ctry_list.length)];
+            //var selectedCtry = ctry_list[Math.floor(Math.random()*ctry_list.length)];
             map.title('Select a country');
             map.color("Country");
             map.data(data).draw();
