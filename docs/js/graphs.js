@@ -109,7 +109,7 @@ function showPredictions(error, data) {
   treeNote('select country', selectedCtry, target);
 
   function mapNote(target){
-    if (target==2) {var string = "Greyed-out countries have insufficient data to generate predictions, usually because they already export most products. Try predicting comparative advantage."}
+    if (target==1 && mode=='select product') {var string = "Greyed-out countries have insufficient data to generate predictions, usually because they already export most products. Try predicting comparative advantage."}
     else {var string =''};
     document.getElementById('map-notes').innerHTML = string;
   }
@@ -188,9 +188,9 @@ updateTable('select country', selectedCtry);
         "projection": "equirectangular"
         })
     .type("geo_map")
-    .id("origin")
+    //.id("origin")
     .color("Country")
-    .text({value: "Country", mute:["Kyrgyzstan","Mozambique"]}) //some issue with these two countries
+    //.text({value: "Country", mute:["Kyrgyzstan","Mozambique"]}) //some issue with these two countries
     .focus(undefined, ctrySelectAction)
     .ui([{
         "method": function(value) {
@@ -260,6 +260,7 @@ updateTable('select country', selectedCtry);
 
 
     function updateMap(mode, target, selection){
+         mapNote(target, mode);
          if (mode =='select country') {
             map.data(Data(data, target));
             map.title('Select a country');
@@ -267,7 +268,6 @@ updateTable('select country', selectedCtry);
             map.draw();
             updateTree(mode, selection, target);
             updateTable(mode, selection, target);
-            mapNote(target);
         };
         if (mode =='select product') {
             map.focus(undefined); //zoom out if necessary
