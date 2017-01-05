@@ -188,9 +188,9 @@ updateTable('select country', selectedCtry);
         "projection": "equirectangular"
         })
     .type("geo_map")
-    .id("origin")
+    //.id("origin")
     .color("Country")
-    .text({value: "Country", mute:["Kyrgyzstan","Mozambique"]}) //some issue with these two countries
+    //.text({value: "Country", mute:["Kyrgyzstan","Mozambique"]}) //some issue with these two countries
     .focus(undefined, ctrySelectAction)
     .ui([{
         "method": function(value) {
