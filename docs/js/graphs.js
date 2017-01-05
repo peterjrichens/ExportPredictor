@@ -188,19 +188,17 @@ updateTable('select country', selectedCtry);
     .ui([{
         "method": function(value) {
             target = value;
-            console.log(target)
-            console.log(mapMode)
-            console.log(selectedCmd)
-            console.log(selectedCtry)
             if (mapMode=='select country') {
                 updateTree(mapMode, selectedCtry, target);
                 updateTable(mapMode, selectedCtry, target);
-            }
+                updateMap(mapMode, target, selectedCtry);
+             }
             if (mapMode=='select product') {
                 updateTree(mapMode, selectedCmd, target);
                 updateTable(mapMode, selectedCmd, target);
-            }
-            updateMap(mapMode, target, selectedCtry);},
+                updateMap(mapMode, target, selectedCmd);
+             }
+            },
         "type": 'toggle',
         "value": [{'Predict exports': 1}, {'Predict comparative advantage': 2}]
         },
@@ -218,10 +216,6 @@ updateTable('select country', selectedCtry);
                 updateTable(mapMode, selectedCmd, target);
                 updateMap('select product', target, selectedCmd)
                 }
-            console.log(target);
-            console.log(mapMode);
-            console.log(selectedCmd);
-            console.log(selectedCtry);
             },
         "value": ['Browse by country', 'Browse by product']
         },
@@ -230,15 +224,9 @@ updateTable('select country', selectedCtry);
         "method": function(value, map) {
             selectedCmd = value
             mapMode = 'select product'
-            //map.title(productTitle(selectedCmd, target));
-            //map.data(cmdData(selectedCmd, target));
             updateMap('select product', target, selectedCmd);
             updateTree(mapMode, selectedCmd, target);
             updateTable(mapMode, selectedCmd, target);
-            console.log(target);
-            console.log(mapMode);
-            console.log(selectedCmd);
-            console.log(selectedCtry);
             },
         "type": "drop",
         "value": cmd_list
@@ -261,10 +249,6 @@ updateTable('select country', selectedCtry);
                 updateTable(mapMode, selectedCtry, target);
                 map.title("Click selected country to zoom out");
                 }
-            console.log(target);
-            console.log(mapMode);
-            console.log(selectedCmd);
-            console.log(selectedCtry);
             };
 
 
@@ -278,13 +262,12 @@ updateTable('select country', selectedCtry);
             updateTable(mode, selection, target);
         };
         if (mode =='select product') {
+            map.focus(undefined); //zoom out if necessary
             map.title(productTitle(selection, target));
             map.data(cmdData(selection, target));
             map.color("probability");
-            map.color("probability");
             map.tooltip("probability");
             map.draw();
-
         };
     }
 
