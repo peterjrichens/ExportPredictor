@@ -34,9 +34,9 @@ function showPredictions(error, data) {
           return d.target == target;})
   };
 
-  var mapMode ='select country'
+  var mapMode = 'select country'
 
-  var countryData = function (ctry) {
+  function countryData(ctry, target) {
     return Data(data, target).filter(function(d){
           return d.Country == ctry;})
   };
@@ -54,34 +54,43 @@ function showPredictions(error, data) {
   };
 
     var countryCodeFromName = function (name) {
-         var slice = countryData(name);
+         var slice = countryData(name, target);
          return slice[0].origin;
   };
 
 
-  var cmdData = function (cmd) {
+  function cmdData(cmd, target) {
     return Data(data, target).filter(function(d){
           return d.product == cmd;})
   };
 
   function ctryTitle(Country) {
-        return "Products ".concat(Country).concat(" is most likely to start exporting");
+     if (target == 1) {
+        return "Products ".concat(Country).concat(" may start exporting");};
+     if (target == 2) {
+        return "Products ".concat(Country).concat(" may develop comparative advantage in");};
   }
 
   function productTitle(cmd) {
-        return "Countries most likely to start exporting ".concat(cmd);
+        if (target == 1) {
+            return "Countries likely to start exporting ".concat(cmd);};
+        if (target == 2) {
+            return "Countries likely to develop comparative advantage in ".concat(cmd);};
   }
 
   var selectedCtry = ctry_list[Math.floor(Math.random()*ctry_list.length)]; // start with ramdom ctry in ctry_list
 
   function treeNote (mode, selection){
       if (mode == 'select country'){
-        var count = countryData(selection).length.toString()
-        if (count == 1) {var string = "There is only 1 product ".concat(selection).concat(" has not exported.");
-        } else {var string = "There are ".concat(count).concat(" products ").concat(selection).concat(" has not exported.");};
+        var count = countryData(selection, target).length.toString()
+        if (count == 1) {var string = "There is only 1 product ".concat(selection).concat(" has not exported. Try predicting comparative advantage.");
+        }
+        if (count >1 && count < 20) {var string = "There are only ".concat(count).concat(" products ").concat(selection).concat(" has not exported. Try predicting comparative advantage.");
+        }
+        if (count >= 20) {var string = "There are ".concat(count).concat(" products ").concat(selection).concat(" has not exported.");};
       }
       if (mode == 'select product'){
-        var count = cmdData(selection).length.toString()
+        var count = cmdData(selection, target).length.toString()
         if (count == 1) {var string = "Only 1 country has not exported ".concat(selection).concat('.');
         } else {var string = count.concat(" countries have not exported ").concat(selection).concat('.');};
       }
@@ -95,7 +104,7 @@ function showPredictions(error, data) {
   var tree = d3plus.viz()
     .container("#tree")
     .title(ctryTitle(selectedCtry))
-    .data(countryData(selectedCtry))
+    .data(countryData(selectedCtry, target))
     .type("tree_map")
     .id(['category','SubCategory','product'])
     .size('probability')
@@ -110,13 +119,13 @@ function showPredictions(error, data) {
 
 function updateTree(mode, selection){
     if (mode == 'select country'){
-        var ctryD = countryData(selection);
+        var ctryD = countryData(selection, target);
         tree.id(['category','SubCategory','product'])
         tree.title(ctryTitle(selection));
         tree.data(ctryD).draw();
     }
     if (mode == 'select product'){
-        var cmdD = cmdData(selection);
+        var cmdD = cmdData(selection, target);
         tree.id('Country')
         tree.title(productTitle(selection));
         tree.data(cmdD).draw();
@@ -133,9 +142,9 @@ function updateTree(mode, selection){
 	.messages("Loading...")
 	.font({"align":"left"})
 
-function updateTable(mode, selection){
+function updateTable(mode, selection, target){
     if (mode == 'select country'){
-        var ctryD = countryData(selection);
+        var ctryD = countryData(selection, target);
         var height = 30*(ctryD.length+1); // 30 pixels for each row including header
         table.id('cmd')
         table.cols({"value": ['category','product','probability'],"index":false})
@@ -144,7 +153,7 @@ function updateTable(mode, selection){
         table.data(ctryD)//.draw();
     }
     if (mode == 'select product'){
-        var cmdD = cmdData(selection);
+        var cmdD = cmdData(selection, target);
         var height = 30*(cmdD.length+1); // 30 pixels for each row including header
         table.id('origin')
         table.cols({"value": ['Country','probability'],"index":false})
@@ -173,8 +182,17 @@ updateTable('select country', selectedCtry);
         "method": function(value) {
             target = value;
             console.log(target)
-            updateTree(mapMode, selectedCmd);
-            updateTable(mapMode, selectedCmd);
+            console.log(mapMode)
+            console.log(selectedCmd)
+            console.log(selectedCtry)
+            if (mapMode=='select country') {
+                updateTree(mapMode, selectedCtry, target);
+                updateTable(mapMode, selectedCtry, target);
+            }
+            if (mapMode=='select product') {
+                updateTree(mapMode, selectedCmd);
+                updateTable(mapMode, selectedCmd);
+            }
             updateMap(mapMode);},
         "type": 'toggle',
         "value": [{'Predict exports': 1}, {'Predict comparative advantage': 2}]
@@ -187,7 +205,7 @@ updateTable('select country', selectedCtry);
             if (value=='Browse by product'){
                 var mapMode ='select product';
                 map.title(productTitle(selectedCmd));
-                map.data(cmdData(selectedCmd));
+                map.data(cmdData(selectedCmd, target));
                 updateTree(mapMode, selectedCmd);
                 updateTable(mapMode, selectedCmd);
                 }
@@ -200,7 +218,7 @@ updateTable('select country', selectedCtry);
             selectedCmd = value
             var mapMode = 'select product'
             map.title(productTitle(selectedCmd));
-            map.data(cmdData(selectedCmd));
+            map.data(cmdData(selectedCmd, target));
             updateMap('select product');
             updateTree(mapMode, selectedCmd);
             updateTable(mapMode, selectedCmd);
