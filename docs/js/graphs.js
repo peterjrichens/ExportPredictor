@@ -8,6 +8,7 @@ function showPredictions(error, data) {
 
   data.forEach(function(d) {
         d.probability = +d.proba_pred;
+        d.target = +d.target;
         d.product = d.cmd_name;
         d.category = d.name_1dg;
         d.SubCategory = d.name_2dg;
@@ -27,14 +28,20 @@ function showPredictions(error, data) {
  var cmd_list = cmds.map(i => i.key).sort()
  cmd_list.unshift('select a product'); //push placeholder to top
 
+ var target = 1 // {1: exports, 2: comparative advantage}
+ function Data(data, target) {
+    return data.filter(function(d){
+          return d.target == target;})
+  };
+
 
   var countryData = function (ctry) {
-    return data.filter(function(d){
+    return Data(data, target).filter(function(d){
           return d.Country == ctry;})
   };
 
   var countryDataCode = function (ctry) {
-    return data.filter(function(d){
+    return Data(data, target).filter(function(d){
           return d.origin == ctry;})
   };
 
@@ -52,7 +59,7 @@ function showPredictions(error, data) {
 
 
   var cmdData = function (cmd) {
-    return data.filter(function(d){
+    return Data(data, target).filter(function(d){
           return d.product == cmd;})
   };
 
@@ -161,7 +168,15 @@ updateTable('select country', selectedCtry);
     .color("Country")
     .text({value: "Country", mute:["Kyrgyzstan","Mozambique"]}) //some issue with these two countries
     .focus(undefined, ctrySelectAction)
-    .ui([
+    .ui([{
+        "method": function(value) {
+            target = value;
+            updateTree(mapMode, selectedCmd);
+            updateTable(mapMode, selectedCmd);
+            updateMap(mapMode);},
+        "label": "Predict:",
+        "value": [{'Exports': 1}, {'Comparative advantage': 2}]
+        },
         {
         "method": function(value) {
             if (value=='Browse by country'){
