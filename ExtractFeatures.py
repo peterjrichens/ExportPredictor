@@ -71,6 +71,7 @@ FEATURES are computed as follows:
         average_cmd:        The average discovery rate across countries for product p in the previous time period.
 
 '''
+
 def has_export(yr_range=DB_YR_RANGE):
     # returns dataframe. rows: origin-commodity, columns: years
     query = '''select countries.code as origin, commodities.code as cmd
@@ -78,9 +79,10 @@ def has_export(yr_range=DB_YR_RANGE):
                 order by origin, cmd
             '''
     has_export = pd.read_sql(query, engine)
-    for yr in yr_range:
+    print "finding 'exports'..."
+    for yr in tqdm(yr_range):
         query = '''select origin, cmd, 1 as has_export_%s
-                   from comtrade
+                   from (select * from comtrade where value > 100) a
                    where yr = %d
                    group by origin, cmd
                     ''' % (yr, yr)

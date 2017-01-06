@@ -104,7 +104,7 @@ def plot_scores(series, labels, years, title, ylim=None):
     for series, lab, color in zip(series, labels, colors):
         plt.plot(d_range, series, 'o-', color=color, label=lab)
     plt.legend(loc="best")
-    plt.savefig('docs/images/roc_curve_no_labels.png' % title)
+    plt.savefig('docs/images/%s.png' % title)
 
 def roc_curve(clfr, X, y, test_year= TRAIN_YR_T, calibrate=True):
     cv = split_by_yr(X, y, [test_year])
@@ -213,12 +213,12 @@ def predictions_to_csv(predictions, parent_names, target):
 
     predictions['target'] = target
     try:
-        current_file = pd.read_csv('docs/predicitons.csv', sep='\t', encoding='utf-8')
+        current_file = pd.read_csv('docs/predictions.csv', sep='\t', encoding='utf-8')
         current_file = current_file[current_file.target != target]
         predictions = pd.concat([current_file, predictions], axis=0)
-    except Exception:
-        pass
-    predictions.to_csv('docs/predicitons.csv', index=None, sep='\t', encoding='utf-8')
+    except Exception as ex:
+        print ex
+    predictions.to_csv('docs/predictions.csv', index=None, sep='\t', encoding='utf-8')
 
 
 
