@@ -208,7 +208,7 @@ updateTable('select country', selectedCtry);
              }
             },
         "type": 'toggle',
-        "value": [{'Predict exports': 1}, {'Predict comparative advantage': 2}]
+        "value": [{'Predict product discovery': 1}, {'Predict comparative advantage': 2}]
         },
         {
         "method": function(value) {
