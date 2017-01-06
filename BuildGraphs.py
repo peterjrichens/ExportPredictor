@@ -54,8 +54,8 @@ if __name__ == "__main__":
 
     build_graph('rca', 0.4)
     build_graph('imports', 0.85)
-    build_graph('export_destination', 0.9)
-    build_graph('import_origin', 0.9)
+    build_graph('export_destination', 0.925)
+    build_graph('import_origin', 0.925)
     build_graph('intensity', 0.035)
     build_graph('distance', 1000, k = 0)
 
