@@ -119,11 +119,40 @@ class MLDataset(db.Model):
         self.cmd_average = cmd_average
 
 # database for an alternative definition of 'new export'
-class MLDataset2(MLDataset, db.Model):
+class MLDataset2(db.Model):
     __tablename__ = "mldataset2"
-    pass
+    origin = db.Column(db.Integer, db.ForeignKey('mldataset.origin'), primary_key=True)
+    cmd = db.Column(db.Integer, db.ForeignKey('mldataset.cmd'), primary_key=True)
+    year = db.Column(db.Integer, db.ForeignKey('mldataset.year'), primary_key=True)
+    # new names for relationship class variables
+    countries = db.relationship('Country', backref=db.backref('Country_ml2', lazy='dynamic'), foreign_keys=[origin, cmd, year])
+    commodities = db.relationship('Commodity', backref=db.backref('Commodity_ml2', lazy='dynamic'), foreign_keys=[origin, cmd, year])
+    new_export = db.Column(db.Integer)
+    rca = db.Column(db.Float)
+    export_destination = db.Column(db.Float)
+    intensity = db.Column(db.Float)
+    imports = db.Column(db.Float)
+    import_origin = db.Column(db.Float)
+    market_share = db.Column(db.Float)
+    distance = db.Column(db.Float)
+    origin_average = db.Column(db.Float)
+    cmd_average = db.Column(db.Float)
 
-
+    def __init__(self, origin, cmd, year, new_export, rca, export_destination, intensity,
+                 imports, import_origin, market_share, distance, origin_average, cmd_average):
+        self.origin = origin
+        self.cmd = cmd
+        self.year = year
+        self.new_export = new_export
+        self.rca = rca
+        self.export_destination = export_destination
+        self.intensity = intensity
+        self.imports = imports
+        self.import_origin = import_origin
+        self.market_share = market_share
+        self.distance = distance
+        self.origin_average = origin_average
+        self.cmd_average = cmd_average
 
 
 

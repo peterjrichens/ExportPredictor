@@ -197,10 +197,28 @@ def parent_names(year = TRAIN_YR_T):
     return pd.read_sql(query, engine)
 
 
-def predictions_to_csv(predictions, parent_names, save_as):
+def predictions_to_csv(predictions, parent_names, target):
     predictions = predictions.merge(parent_names, how='left', on='cmd')
-    predictions.origin = predictions.origin.apply(lambda x: str(x).zfill(3)) # for compatibility with topojson
-    predictions.to_csv('docs/%s.csv' % save_as, index=None, sep='\t', encoding='utf-8')
+
+    # edit country codes for compatibility with topojson
+    predictions.origin = predictions.origin.apply(lambda x: str(x).zfill(3))
+    ctry_map_dict = {code: code for code in list(set(predictions.origin.values))}
+    ctry_map_dict['842'] = '840'  # USA
+    ctry_map_dict['699'] = '356'  # India
+    ctry_map_dict['381'] = '380'  # Italy
+    ctry_map_dict['251'] = '250'  # France
+    ctry_map_dict['579'] = '578'  # Norway
+    ctry_map_dict['757'] = '756'  # Switzerland
+    predictions.origin = predictions.origin.apply(lambda x: ctry_map_dict[x])
+
+    predictions['target'] = target
+    try:
+        current_file = pd.read_csv('docs/predicitons.csv', sep='\t', encoding='utf-8')
+        current_file = current_file[current_file.target != target]
+        predictions = pd.concat([current_file, predictions], axis=0)
+    except Exception:
+        pass
+    predictions.to_csv('docs/predicitons.csv', index=None, sep='\t', encoding='utf-8')
 
 
 
@@ -221,14 +239,14 @@ if __name__ == "__main__":
     prediction_set = load_data('mldataset', start_yr=TEST_YR, end_yr=TEST_YR)
     predictions = predictions(clfr, X, y, prediction_set, calibrate=True)
     parent_names = parent_names()
-    predictions_to_csv(predictions, parent_names, 'export_predictions')
+    predictions_to_csv(predictions, parent_names, 1)
 
     # predictions using mldataset2
     TRAIN_YR_0, TRAIN_YR_T, TEST_YR = get_db_yr_range('mldataset2')
     X, y = load_data('mldataset2')
     prediction_set = load_data('mldataset2', start_yr=TEST_YR, end_yr=TEST_YR)
     predictions = predictions(clfr, X, y, prediction_set, calibrate=True, drop_threshold=0.005)
-    predictions_to_csv(predictions, parent_names, 'rca_predictions')
+    predictions_to_csv(predictions, parent_names, 2)
 
 
 

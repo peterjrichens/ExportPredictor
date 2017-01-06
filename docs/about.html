@@ -122,16 +122,23 @@
               Multiple measures of country distance are combined in a machine
               learning model trained to predict export discoveries.
             </p>
+            <a name="data"></a>
+            <h3>Data</h3>
+            <p>
+              The Export Predictor is built using international trade data from
+              <a href="https://comtrade.un.org/" target="_blank">UN Comtrade</a>.
+              The data used covers the last 20 years, over 200 countries and more than
+              1,200 products. Data reported by the importing country is generally more reliable and used unless missing
+              (in which case data reported by the exporter is used). Some products such as oil are
+              excluded as they depend more on natural resource endowments than productive knowledge.
+            </p>
             <a name="proximity"></a>
             <h3>Country proximity</h3>
             <p>
-              The <a href="https://comtrade.un.org/" target="_blank">UN Comtrade Database</a>
-              is used to measure distance between countries along the following dimensions:
+              Distance between countries is measured along the following dimensions:
             </p>
             <ul>
-              <li><strong><span class="gTerm" style="cursor:help;"
-             title="Some products such as oil are excluded as they depend more on natural resource endownments than productive knowledge.">
-             Products exported</span></strong> (how similar countries are in terms of
+              <li><strong>Products exported</strong> (how similar countries are in terms of
                 the products they export).</li>
               <li><strong>Products imported</strong> (how similar countries are in terms of
                   the products they import).</li>
@@ -160,7 +167,7 @@
            <p>
              Considering only completely new products will not generate useful predictions for
              industrialised and large emerging economies that already
-             export most of the (around 1,200) products in the database. The model
+             export most of the products in the database. The model
              is therefore separately trained to also predict new areas of comparative
              advantage. A country is said to have revealed comparative advantage
              if it's export share of a product exceeds that product's share
@@ -264,6 +271,7 @@
           <div class="sidebar-module sidebar-module-inset">
             <h4>Navigate</h4>
             <p><a href="#intro">Rationale</a></p>
+            <p><a href="#data">Data</a></p>
             <p><a href="#proximity">Country proximity</a></p>
             <p><a href="#predictions">Export predictions</a></p>
             <p><a href="#evaluation">Model evaluation</a></p>
