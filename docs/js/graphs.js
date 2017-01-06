@@ -94,6 +94,7 @@ function showPredictions(error, data) {
         if (count >1 && count < 20) {var string = "There are only ".concat(count).concat(" products ").concat(selection).concat(" has not exported. Try predicting comparative advantage.");
         }
         if (count >= 20) {var string = "There are ".concat(count).concat(" products ").concat(selection).concat(" has not exported.");};
+      if (string == undefined) {var string = selection.concat(" already exports all the products in the database. Try predicting comparative advantage.")};
       }}
       if (mode == 'select product'){
         var count = cmdData(selection, target).length.toString()
@@ -104,7 +105,6 @@ function showPredictions(error, data) {
         if (count == 1) {var string = "Only 1 country has not exported ".concat(selection).concat('.');
         } else {var string = count.concat(" countries have not exported ").concat(selection).concat('.');};
       }}
-      if (string == undefined) {var string = "Try predicting comparative advantage."};
       document.getElementById('tree-notes').innerHTML = string;
     };
   treeNote(mapMode, selectedCtry, target);
