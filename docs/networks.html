@@ -32,6 +32,7 @@
     </div>
   </div>
     <div class="row">
+
       <span class="dropdown"><p>Country proximity based on:</p>
         <select id="menu1">
           <option value="1">Products exported</a></option>
@@ -42,6 +43,8 @@
           <option value="6">Geographic distance</a></option>
         </select>
       </span>
+
+
     </div>
 
     <div class="container-fluid">
@@ -63,9 +66,13 @@
     </div>
     </div>
     <div class="row">
-      <p>Try dragging the countries around for a better view. Double click to release a fixed node.</p>
-      <input id="target_node" name="target_node" type="text" placeholder="Find a country" />
-      <button onclick="resize_target()">Find</button>
+      <div class="col-md-6">
+            <p>Countries are shown as connected if their promixity is below a threshold (chosen for legibility of the network).
+            Try dragging the countries around for a better view. Double click to release a fixed node.</p>
+            <input id="target_node" name="target_node" type="text" placeholder="Find a country" />
+            <button onclick="resize_target()">Find</button>
+      </div>
+
     </div>
 
     <hr>
